@@ -1,12 +1,12 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
 
-const user = sequelize.define(
+const staffprofile = sequelize.define(
   "staffProfile",
   {
     staffId: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
+    type: DataTypes.INTEGER,
+    autoIncrement:true,
       primaryKey: true,
       allowNull: false,
     },
@@ -14,7 +14,7 @@ const user = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    EamilId: {
+    EmailId: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -24,7 +24,7 @@ const user = sequelize.define(
       allowNull: false,
     },
     Role: {
-      type: DataTypes.ENUM("Student", "Staff"),
+      type: DataTypes.ENUM("Staff"),
       allowNull: false,
     },
     Designation: {
@@ -33,8 +33,11 @@ const user = sequelize.define(
     },
   },
   {
+    initialAutoIncrement: 1000,
+  },
+  {
     timestamps: true,
   }
 );
 
-module.exports = user;
+module.exports = staffprofile;

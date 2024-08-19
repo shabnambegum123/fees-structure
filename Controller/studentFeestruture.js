@@ -1,16 +1,13 @@
-const user = require("../Database/modal/user4");
+//const studentFeestruture = require("../Database/modal/studentFeestruture");
 
 const {
-  createstudent4,
-  updatestudent4,
-  liststudent4,
-  getByIdstudent4,
-  deletestudent4,
-} = require("../service/service4");
+  createstudentFeeStructure,updatestudentFeeStructure,getByIdstudentFeeStructure,deletestudentFeeStructure,
+  liststudentFeestructure
+} = require("../service/studentFeestrutureservice");
 
-const createUser = async (req, res) => {
+const createstudentFee = async (req, res) => {
   const datas = req.body;
-  let result = await createstudent4(datas);
+  let result = await createstudentFeeStructure(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -26,12 +23,12 @@ const createUser = async (req, res) => {
   }
 };
 
-const updateUser = async () => {
+const updatestudentFee = async (req,res) => {
   let datas = {};
-  datas.ID = req.query.id;
-  datas.Name = req.body.Name;
+  datas.studentId = req.query.studentId;
+  datas.Designation = req.body.Designation;
 
-  const result = await updatestudent4(datas);
+  const result = await updatestudentFeeStructure(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -47,9 +44,27 @@ const updateUser = async () => {
   }
 };
 
-const listUser = async () => {
+const liststudentfee = async (req,res) => {
+  const datas = req.query;
+  const result = await liststudentFeestructure(datas);
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+};
+
+const getByIdstudentFee = async (req,res) => {
   const datas = req.body;
-  const result = await liststudent4(datas);
+  const result = await getByIdstudentFeeStructure(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -65,9 +80,9 @@ const listUser = async () => {
   }
 };
 
-const getById = async () => {
+const deletestudentFee = async (req,res) => {
   const datas = req.body;
-  const result = await getByIdstudent4(datas);
+  const result = await deletestudentFeeStructure(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -83,22 +98,4 @@ const getById = async () => {
   }
 };
 
-const deleteUser = async () => {
-  const datas = req.body;
-  const result = await deletestudent4(datas);
-  if (result.status) {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
-  } else {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
-  }
-};
-
-module.exports = { createUser, updateUser, listUser, getById, deleteUser };
+module.exports = { createstudentFee, updatestudentFee,   liststudentfee,  getByIdstudentFee, deletestudentFee };

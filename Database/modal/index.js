@@ -1,24 +1,20 @@
-// const sequelize = require("../database");
+const sequelize = require("../database");
 
-// const studentProfile = require("sequelize");
-// const staffProfile = require("sequelize");
-// const feestructure = require("sequelize");
-// const studentFeestruture = require("sequelize");
+const studentProfile = require("./studentprofile");
+const staffProfile = require("./staffprofile");
+const feestructure = require("./feestructure");
+const studentFeestruture = require("./studentFeestruture");
 
-// sequelize
-//   .sync({ force: false })
-//   .then(() => {
-//     console.log("connected");
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("connected");
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
-// module.exports = sequelize;
-
-
-
-
+module.exports = sequelize;
 
 // let data = ['hello','hii']  // convert array to object
 

@@ -9,6 +9,8 @@ dotenv.config()
 
 const router = require('./Router/router')
 
+app.use(router)
+
 require('./Database/modal/index')
 
 let PORT = process.env.PORT

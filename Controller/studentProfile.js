@@ -1,16 +1,16 @@
-const user = require("../Database/modal/user2");
-
 const {
-  createstudent2,
-  updatestudent2,
-  liststudent2,
-  getByIdstudent2,
-  deletestudent2,
-} = require("../service/service2");
+  createstudent,
+  updatestudent,
+  liststudent,
+  getByIdstudent,
+  deletestudent,
+  tokenGenerate,
+  verifyToken
+} = require("../service/studentProfileservice");
 
 const createUser = async (req, res) => {
-  const datas = req.body;
-  let result = await createstudent2(datas);
+  let result = await createstudent(req.body);
+
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -26,11 +26,10 @@ const createUser = async (req, res) => {
   }
 };
 
-const updateUser = async () => {
-  let datas = {};
-  datas.ID = req.query.id;
-  datas.Name = req.body.Name;
-  const result = await updatestudent2(datas);
+const updateUser = async (req, res) => {
+  let params = req.body;
+  params.profileId = req.query.profileId;
+  const result = await updatestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -46,9 +45,27 @@ const updateUser = async () => {
   }
 };
 
-const listUser = async () => {
+const listUser = async (req, res) => {
+  //const datas = req.body;
+  const result = await liststudent();
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+};
+
+const getById = async (req, res) => {
   const datas = req.body;
-  const result = await liststudent2(datas);
+  const result = await getByIdstudent(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -64,9 +81,9 @@ const listUser = async () => {
   }
 };
 
-const getById = async () => {
+const deleteUser = async (req, res) => {
   const datas = req.body;
-  const result = await getByIdstudent2(datas);
+  const result = await deletestudent(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -82,9 +99,11 @@ const getById = async () => {
   }
 };
 
-const deleteUser = async () => {
-  const datas = req.body;
-  const result = await deletestudent2(datas);
+const loginUser = async (req, res) => {
+  let params = req.body;
+  params.password = req.body.password;
+  params.EmailId = req.body.EmailId;
+  let result = await tokenGenerate(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -99,5 +118,31 @@ const deleteUser = async () => {
     });
   }
 };
+const verifyUser = async (req,res)=>{
+  let params = req.headers;
+ 
+  let result = await verifyToken(params);
 
-module.exports = { createUser, updateUser, listUser, getById, deleteUser };
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+}
+module.exports = {
+  createUser,
+  updateUser,
+  listUser,
+  getById,
+  deleteUser,
+  loginUser,
+  verifyUser
+};
