@@ -1,7 +1,7 @@
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 
 //not createsd studentFeestruture created in students profile service
- const createstudentFeeStructure = async (params) => { 
+const createstudentFeeStructure = async (params) => {
   let info = {
     studentId: params.studentId,
     Designation: params.Designation,
@@ -27,12 +27,12 @@ const studentFeestruture = require("../Database/modal/studentFeestruture");
       data: {},
     };
   }
- };
+};
 
 //To update student feestructure
-const updatestudentFeeStructure = async(params)=>{
+const updatestudentFeeStructure = async (params) => {
   let studentId = params.studentId;
-  let result =studentFeestruture.update(
+  let result = studentFeestruture.update(
     { Designation: params.Designation },
     { where: { studentId: studentId } }
   );
@@ -50,10 +50,10 @@ const updatestudentFeeStructure = async(params)=>{
       data: {},
     };
   }
-}
-const getByIdstudentFeeStructure = async (params)=>{
-  let studentId = params.studentId ;
-  let result = studentFeestruture.findOne({ where: { studentId : studentId } });
+};
+const getByIdstudentFeeStructure = async (params) => {
+  let studentId = params.studentId;
+  let result = studentFeestruture.findOne({ where: { studentId: studentId } });
   if (result) {
     return {
       statusCode: 200,
@@ -65,11 +65,11 @@ const getByIdstudentFeeStructure = async (params)=>{
     return {
       status: 400,
       message: "not found",
-      data:{},
+      data: {},
     };
   }
-}
-const deletestudentFeeStructure = async (params)=>{
+};
+const deletestudentFeeStructure = async (params) => {
   let studentId = params.studentId;
   let result = studentFeestruture.destroy({ where: { studentId: studentId } });
   if (result) {
@@ -77,39 +77,44 @@ const deletestudentFeeStructure = async (params)=>{
       statusCode: 200,
       status: true,
       message: "success",
-      data:result,
+      data: result,
     };
   } else {
     return {
       status: 400,
       message: "not found",
-      data:{},
+      data: {},
     };
   }
-}
+};
 // list fees structure
-const liststudentFeestructure = async(params)=>{
-  let studentId = params.studentId
+const liststudentFeestructure = async (params) => {
+  let studentId = params.studentId;
 
-  let result = await studentFeestruture.findAll({where:{studentId : studentId},raw:true});
-   if (!result.length>0) {
-      return {
-            statusCode: 404 ,
-            status: false,
-            message: "not found",
-            data:{},
-          };
-        
-      } else {
-        return {
-          statusCode: 200,
-          status : true,
-          message: "sended",
-          data:result,
-        };
-      }
-    
-
-
-}
-module.exports = { liststudentFeestructure,createstudentFeeStructure,updatestudentFeeStructure,getByIdstudentFeeStructure,deletestudentFeeStructure, };
+  let result = await studentFeestruture.findAll({
+    where: { studentId: studentId },
+    raw: true,
+  });
+  if (!result.length > 0) {
+    return {
+      statusCode: 404,
+      status: false,
+      message: "not found",
+      data: {},
+    };
+  } else {
+    return {
+      statusCode: 200,
+      status: true,
+      message: "sended",
+      data: result,
+    };
+  }
+};
+module.exports = {
+  liststudentFeestructure,
+  createstudentFeeStructure,
+  updatestudentFeeStructure,
+  getByIdstudentFeeStructure,
+  deletestudentFeeStructure,
+};

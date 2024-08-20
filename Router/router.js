@@ -1,5 +1,5 @@
 const router = require("express").Router();
-
+const {verifyToken, verifyRole } = require("../middleWare/Authentication")
 const {
   createUser,
   updateUser,
@@ -7,7 +7,7 @@ const {
   getById,
   deleteUser,
   loginUser,
-  verifyUser
+  verifyUser,
 } = require("../Controller/studentProfile");
 
 const {
@@ -33,18 +33,17 @@ const {
   getByIdstaff,
   deletestaff,
   loginstaff,
-  verifystaffToken
-} = require("../Controller/staffprofile")
-
+  verifystaffToken,
+} = require("../Controller/staffprofile");
 
 // student profile
 router.post("/create/Profile", createUser);
 router.post("/login/user", loginUser);
-router.put("/update/user", updateUser);
+router.put("/update/user",[verifyToken,verifyRole(['student'])], updateUser);
 router.get("/list", listUser);
 router.get("/byId", getById);
 router.delete("/delete", deleteUser);
-router.get("/token/check",verifyUser)
+router.get("/token/check", verifyUser);
 
 // fees structure
 router.post("/create/feestructure", createFeestructure);
@@ -60,14 +59,13 @@ router.get("/getId/studentfee", getByIdstudentFee);
 router.get("/list/studentfee", liststudentfee);
 router.delete("/delete/studentfee", deletestudentFee);
 
-
-// staff profile 
+// staff profile
 router.post("/create/staffee", createstaff);
-router.put("/update/staffee",updatestaff);
+router.put("/update/staffee", updatestaff);
 router.get("/getId/staffee", getByIdstaff);
 router.get("/list/staffee", liststaff);
-router.delete("/delete/staffee",  deletestaff);
-router.post("/login/staff",loginstaff)
-router.get ("/verify/token",verifystaffToken)
+router.delete("/delete/staffee", deletestaff);
+router.post("/login/staff", loginstaff);
+router.get("/verify/token", verifystaffToken);
 
 module.exports = router;

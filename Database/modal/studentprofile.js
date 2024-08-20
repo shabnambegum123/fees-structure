@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, BOOLEAN } = require("sequelize");
 const sequelize = require("../database");
 
 const studentProfile = sequelize.define(
@@ -56,6 +56,10 @@ const studentProfile = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    is_deleted :{
+      type :DataTypes.BOOLEAN,
+      allowNull: true
+    }
   },
   {
     timestamps: true,

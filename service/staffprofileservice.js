@@ -4,6 +4,7 @@ const { generatePassword } = require("../password/bcrypt");
 const jwt = require("jsonwebtoken");
 const { param } = require("../Router/router");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
+const {generateToken} = require("../token")
 
 const createstaffprofile = async (params) => {
   let info = {
@@ -158,9 +159,9 @@ const loginstaffProfile = async (params) => {
 
 const staffToken = async (param) => {
   let token = param.token;
-
-  let generateToken = await jwt.verify(token, process.env.secretKey);
-  if (generateToken) {
+   let generatetoken = await generateToken(token)
+  if (generatetoken.Role === "staff" ) {
+   
     var result = await studentFeestruture.findOne({
       where: { studentId: param.studentId },
       raw: true,
@@ -169,7 +170,7 @@ const staffToken = async (param) => {
       let updatestudentFeeStructure = await studentFeestruture.update(
         { fineAmount: param.fineAmount },
         { where: { studentId: param.studentId } }
-      );
+      )
 
       if (updatestudentFeeStructure) {
         return {

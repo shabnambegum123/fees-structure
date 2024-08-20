@@ -8,6 +8,7 @@ const {
   verifyToken
 } = require("../service/studentProfileservice");
 
+
 const createUser = async (req, res) => {
   let result = await createstudent(req.body);
 
@@ -27,8 +28,10 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  let params = req.body;
-  params.profileId = req.query.profileId;
+  console.log("67788",req.user)
+  let params = req.body
+  params.profileId = req.user.profileId;
+  console.log(params)
   const result = await updatestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({

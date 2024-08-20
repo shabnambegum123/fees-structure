@@ -6,7 +6,8 @@ const jwt = require("jsonwebtoken");
 const feestructure = require("../Database/modal/feestructure");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const nodemailer = require("nodemailer");
-
+const { default: axios } = require("axios");
+const { sendMail } = require("../mail");
 
 const createstudent = async (params) => {
   try {
@@ -28,9 +29,9 @@ const createstudent = async (params) => {
         };
       }
     }
-    
+
     let info = {
-    Name: params.Name,
+      Name: params.Name,
       EmailId: params.EmailId,
       password: params.password,
       mobileNumber: params.mobileNumber,
@@ -40,15 +41,14 @@ const createstudent = async (params) => {
       category: params.category,
       currentYear: params.currentYear,
       feestructureId: params.feestructureId,
-    
     };
-   
 
     info.password = await generatePassword(params.password);
 
     let checkEmailExists = await studentProfile.findOne({
       where: { EmailId: params.EmailId },
     });
+
     let checkMobileNumberExists = await studentProfile.findOne({
       where: { mobileNumber: params.mobileNumber },
     });
@@ -87,22 +87,20 @@ const createstudent = async (params) => {
           checkFeeStructure.BookFee,
         studentId: result.profileId,
       };
-      
 
       if (
         ["BC"].includes(params?.category) &&
         !["true"].includes(params?.is_FirstGraduate)
       ) {
-        
         createStudentFeeData.TotalAmount =
           (checkFeeStructure.TotalAmount *
             checkFeeStructure.Reserved_students_Discount) /
           100;
-        
+
         let percentage =
-         checkFeeStructure.TotalAmount -  createStudentFeeData.TotalAmount;
+          checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
         createStudentFeeData.TotalAmount = percentage;
-      
+
         let createstudentfeestructure = await studentFeestruture.create(
           createStudentFeeData
         );
@@ -130,7 +128,7 @@ const createstudent = async (params) => {
           (checkFeeStructure.TotalAmount *
             checkFeeStructure.FirstGraduate_discount) /
           100;
-          
+
         let percentage =
           checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
         createStudentFeeData.TotalAmount = percentage;
@@ -232,6 +230,8 @@ const createstudent = async (params) => {
 
 const updatestudent = async (params) => {
   let profileId = params.profileId;
+ 
+ 
   let result = await studentProfile.update(
     { Name: params.Name },
     { where: { profileId: profileId } }
@@ -355,56 +355,64 @@ const tokenGenerate = async (params) => {
 };
 const verifyToken = async (params) => {
   let token = params.authorization;
-
-  let generateToken = await jwt.verify(token, process.env.secretKey);
-  //console.log(generateToken.studentFeestrutureId)
-  var result = await studentFeestruture.findAll({
-    where: { studentFeestrutureId: generateToken.studentFeestrutureId },
-    raw: true,
-  });
-  console.log(result)
-
-  var transtorter = await nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "shabnambegum1511@gmail.com",
-      pass: "mzos kxfh gxkd nqln",
-    },
-  });
-  
-
-  var mailOptions = {
-    from: "shabnambegum1511@gmail.com",
-    to: await generateToken.EmailId,
-    subject: "sending mail using node js",
-    text: {
-      studentFeestrutureId : result.studentFeestrutureId
-    },
-   
-  }
-
-  transtorter.sendMail(mailOptions, function (error, info) {
-    if (error) console.log(error);
-    else {
-      console.log("Email sent : successfully");
+  var generatetoken = await generateToken(token);
+  console.log("generatetoken", generatetoken);
+  if (generatetoken.Role == "Student") {
+    var result = await studentFeestruture.findAll({
+      where: { studentFeestrutureId: generatetoken.studentFeestrutureId },
+      raw: true,
+    });
+    if (result.length > 0) {
+      const mailsend = await sendMail(generatetoken.EmailId, result);
+      console.log("mailsend", mailsend);
+      if (mailsend) {
+        return {
+          statusCode: 200,
+          status: true,
+          message: "Email sent successfully",
+          data: {},
+        };
+      } else {
+        return {
+          statusCode: 400,
+          status: false,
+          message: "Something Went Wrong",
+          data: {},
+        };
+      }
     }
-  });
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "success",
-      data: result,
-    };
   }
-  if (generateToken) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "valid",
-      data: {},
-    };
-  } else {
+
+  // let url = "http://localhost:4000/send/Mail";
+
+  // let sendData = await axios(url, result)
+
+  // console.log("wenjdcejkew" , sendData)
+
+  //   .then(() => {
+  //     console.log("Data Sent");
+  //   })
+  //   .catch((Err) => {
+  //     console.log("errr", Err);
+  //   });
+
+  // if (result) {
+  //   return {
+  //     statusCode: 200,
+  //     status: true,
+  //     message: "success",
+  //     data: result,
+  //   };
+  // }
+  // if (generateToken) {
+  //   return {
+  //     statusCode: 200,
+  //     status: true,
+  //     message: "valid",
+  //     data: {},
+  //   };
+  // }
+  else {
     return {
       statusCode: 400,
       status: true,
