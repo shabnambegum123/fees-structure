@@ -196,6 +196,7 @@ const staffToken = async (param) => {
         { where: { studentId: param.studentId } }
       );
       if (updatestudentFeeStructure) {
+        
         var amount = await studentFeestruture.findOne({
           where: { studentId: param.studentId },
           raw: true,
@@ -241,7 +242,7 @@ const paymentmail = async () =>{
     const result = await studentFeestruture.findAll({where:{paidStatus:'pending'},raw:true})
     if(result){
       var map = result.map((x)=>{
-        x = x.studentFeestrutureId
+        x = x.studentId
         return x
       })
       console.log(map)

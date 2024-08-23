@@ -63,6 +63,10 @@ const studentProfile = sequelize.define(
     is_suspended:{
       type :DataTypes.BOOLEAN,
      defaultValue : false
+    },
+    profileImage :{
+      type :DataTypes.STRING
+      
     }
   },
   {
