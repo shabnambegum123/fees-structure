@@ -238,17 +238,22 @@ const staffToken = async (param) => {
 };
 
 const paymentmail = async () =>{
-    const result = await studentFeestruture.findOne({where:{paidStatus:'pending'},raw:true})
+    const result = await studentFeestruture.findAll({where:{paidStatus:'pending'},raw:true})
     if(result){
-      const find = await studentProfile.findOne({where:{studentFeestrutureId:result.studentFeestrutureId},raw:true})
+      var map = result.map((x)=>{
+        x = x.studentFeestrutureId
+        return x
+      })
+      console.log(map)
+      const find = await studentProfile.findOne({where:{studentFeestrutureId:map},raw:true})
       if(find){
-       let amount = await result.TotalAmount
-        let url = "http://localhost:4000/mail/send";
-      let sendData = await axios.post(url,{
-         find:find.EmailId,
-         result : amount
-        })
-        console.log('jhqsbxj',sendData)
+      //  let amount = await result.TotalAmount
+      //   let url = "http://localhost:4000/mail/send";
+      // let sendData = await axios.post(url,{
+      //    find:find.EmailId,
+      //    result : amount
+      //   })
+      //   console.log('jhqsbxj',sendData)
       return{
         statusCode: 200,
             status: true,
