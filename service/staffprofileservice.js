@@ -4,7 +4,9 @@ const { generatePassword } = require("../password/bcrypt");
 const jwt = require("jsonwebtoken");
 const { param } = require("../Router/router");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-const {generateToken} = require("../token")
+const {generateToken} = require("../token");
+const studentProfile = require("../Database/modal/studentprofile");
+const { default: axios, all } = require("axios");
 
 const createstaffprofile = async (params) => {
   let info = {
@@ -235,6 +237,43 @@ const staffToken = async (param) => {
   }
 };
 
+const paymentmail = async () =>{
+    const result = await studentFeestruture.findOne({where:{paidStatus:'pending'},raw:true})
+    if(result){
+      const find = await studentProfile.findOne({where:{studentFeestrutureId:result.studentFeestrutureId},raw:true})
+      if(find){
+       let amount = await result.TotalAmount
+        let url = "http://localhost:4000/mail/send";
+      let sendData = await axios.post(url,{
+         find:find.EmailId,
+         result : amount
+        })
+        console.log('jhqsbxj',sendData)
+      return{
+        statusCode: 200,
+            status: true,
+            message: "updated",
+            data: find
+      }
+     }
+      return{
+        statusCode: 200,
+            status: true,
+            message: "sended",
+            data:{}
+      }
+    }
+    else{
+      return {
+        statusCode: 400,
+        status: true,
+        message: "error",
+        data: {},
+      }
+    }
+}
+
+
 module.exports = {
   createstaffprofile,
   updatestaffprofile,
@@ -243,4 +282,5 @@ module.exports = {
   deletestaffprofile,
   loginstaffProfile,
   staffToken,
+  paymentmail
 };

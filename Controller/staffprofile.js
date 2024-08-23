@@ -7,7 +7,8 @@ const {
   liststaffprofile,
   getByIdstaffprofile,
   deletestaffprofile,
-  loginstaffProfile,staffToken
+  loginstaffProfile,staffToken,
+  paymentmail
 } = require("../service/staffprofileservice");
 
 const createstaff = async (req, res) => {
@@ -141,10 +142,30 @@ if (result.status) {
   }
 }
 
+const mailsend = async (req,res) =>{
+
+  const result = await paymentmail();
+  if (result.status) {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    } else {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    }
+}
+
+
 module.exports = {  createstaff,
   updatestaff,
   liststaff,
   getByIdstaff,
   deletestaff ,
   loginstaff,
-  verifystaffToken};
+  verifystaffToken,
+  mailsend};

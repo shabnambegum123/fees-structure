@@ -1,5 +1,7 @@
+const { date } = require("joi");
 const feestructure = require("../Database/modal/feestructure");
-
+const studentProfile = require("../Database/modal/studentprofile");
+const { default: axios, all } = require("axios");
 const createfeestructureService = async (params) => {
   let info = {
     
@@ -108,7 +110,31 @@ const deletefeestructureService = async (params) => {
       data: {},
     };
   }
-};
+}
+
+const sendMailManagement = async () =>{
+  const find = await studentProfile.findAll({where:{createdAt:new Date()}})
+  if(find){
+    let url = "http://localhost:4000/management/send";
+    let sendData = await axios.post(url,{
+       find : 'hello'
+      })
+      console.log(sendData)
+    return {
+      statusCode: 200,
+      status: true,
+      message: "created",
+      data: {},
+    };
+  }
+  else{
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+}
 
 module.exports = {
   createfeestructureService,
@@ -116,4 +142,8 @@ module.exports = {
   getByIdfeestructureService,
   listfeestructureService,
   deletefeestructureService,
-};
+  sendMailManagement
+}
+
+
+

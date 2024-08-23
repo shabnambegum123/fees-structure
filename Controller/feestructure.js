@@ -1,9 +1,11 @@
+const { sendMail } = require("../mail");
 const {
   createfeestructureService,
   updatefeestructureService,
   getByIdfeestructureService,
   listfeestructureService,
   deletefeestructureService,
+  sendMailManagement
 } = require("../service/feestructureservice");
 
 const createFeestructure = async (req, res) => {
@@ -99,10 +101,30 @@ const deleteFeestructure = async (req,res) => {
   }
 };
 
+const managementMail = async (req,res) =>{
+  //const datas = req.body;
+  const result = await sendMailManagement();
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+}
+
+
 module.exports = {
   createFeestructure,
   updateFeestructure,
   deleteFeestructure,
   getByIdFeestructure,
   listFeestructure,
+  managementMail
 };

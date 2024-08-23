@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const studentProfile = require("../Database/modal/studentprofile");
-
+const joi = require("joi")
 
 const verifyToken = async (req, res, next) => {
   var token = req.headers.authorization;
@@ -33,15 +33,15 @@ const verifyToken = async (req, res, next) => {
 };
 
 const verifyRole = async () => {
-  
-    try {
-      console.log("hhjh", Role);
-      console.log("hbhj", Role);
+  try {
+   
+
     } catch (error) {
-      
-      console.log("wdjdvkj`", error);
+      console.log(error);
     }
   
 };
 
-module.exports = { verifyToken, verifyRole };
+
+
+module.exports = { verifyToken , verifyRole  }

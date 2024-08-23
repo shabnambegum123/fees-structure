@@ -58,7 +58,11 @@ const studentProfile = sequelize.define(
     },
     is_deleted :{
       type :DataTypes.BOOLEAN,
-      allowNull: true
+     defaultValue : false
+    },
+    is_suspended:{
+      type :DataTypes.BOOLEAN,
+     defaultValue : false
     }
   },
   {

@@ -31,6 +31,10 @@ const staffprofile = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    is_deleted: {
+      type : DataTypes.BOOLEAN,
+      defaultValue : false
+    }
   },
   {
     initialAutoIncrement: 1000,

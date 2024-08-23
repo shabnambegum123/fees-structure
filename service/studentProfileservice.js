@@ -6,8 +6,10 @@ const jwt = require("jsonwebtoken");
 const feestructure = require("../Database/modal/feestructure");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const nodemailer = require("nodemailer");
-const { default: axios } = require("axios");
+const { default: axios, all } = require("axios");
 const { sendMail } = require("../mail");
+const {generateToken} = require("../token");
+const { raw } = require("body-parser");
 
 const createstudent = async (params) => {
   try {
@@ -318,11 +320,20 @@ const deletestudent = async (params) => {
 const tokenGenerate = async (params) => {
   let password = params.password;
   let EmailId = params.EmailId;
-
+  let allow = await studentProfile.findOne ({where:{is_suspended:true},raw:true})
+  if(allow){
+    return{
+      statusCode: 200,
+        status: true,
+        message: "you are suspended",
+        data: {}
+    }
+  }
   let result = await studentProfile.findOne({
     where: { EmailId: params.EmailId },
     raw: true,
   });
+
   if (result) {
     let comparepass = await bcrypt.compare(password, result.password);
     if (comparepass) {
@@ -355,47 +366,42 @@ const tokenGenerate = async (params) => {
 };
 const verifyToken = async (params) => {
   let token = params.authorization;
-  var generatetoken = await generateToken(token);
-  console.log("generatetoken", generatetoken);
-  if (generatetoken.Role == "Student") {
+  
+ var generatetoken = await generateToken(token);
+ console.log("generatetoken", generatetoken);
+if (generatetoken.Role == "Student") {
     var result = await studentFeestruture.findAll({
-      where: { studentFeestrutureId: generatetoken.studentFeestrutureId },
+      where: { studentFeestrutureId:generatetoken.studentFeestrutureId },
       raw: true,
     });
-    if (result.length > 0) {
-      const mailsend = await sendMail(generatetoken.EmailId, result);
-      console.log("mailsend", mailsend);
-      if (mailsend) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "Email sent successfully",
-          data: {},
-        };
-      } else {
-        return {
-          statusCode: 400,
-          status: false,
-          message: "Something Went Wrong",
-          data: {},
-        };
-      }
-    }
+    console.log(result)
+    // if (result.length > 0) {
+    //   const mailsend = await sendMail(generatetoken.EmailId, result);
+    //   console.log("mailsend", mailsend);
+    //   if (mailsend) {
+    //     return {
+    //       statusCode: 200,
+    //       status: true,
+    //       message: "Email sent successfully",
+    //       data: {},
+    //     };
+    //   } else {
+    //     return {
+    //       statusCode: 400,
+    //       status: false,
+    //       message: "Something Went Wrong",
+    //       data: {},
+    //     };
+    //   }
+    // }
+    let url = "http://localhost:4000/send/Mail";
+
+  let sendData = await axios.post(url,{
+    result:result,
+    generatetoken : generatetoken.EmailId
+  })
+  console.log("ejkdvjqw"  , sendData)
   }
-
-  // let url = "http://localhost:4000/send/Mail";
-
-  // let sendData = await axios(url, result)
-
-  // console.log("wenjdcejkew" , sendData)
-
-  //   .then(() => {
-  //     console.log("Data Sent");
-  //   })
-  //   .catch((Err) => {
-  //     console.log("errr", Err);
-  //   });
-
   // if (result) {
   //   return {
   //     statusCode: 200,
@@ -412,14 +418,14 @@ const verifyToken = async (params) => {
   //     data: {},
   //   };
   // }
-  else {
-    return {
-      statusCode: 400,
-      status: true,
-      message: "invalid",
-      data: {},
-    };
-  }
+  // else {
+  //   return {
+  //     statusCode: 400,
+  //     status: true,
+  //     message: "invalid",
+  //     data: {},
+  //   };
+  // }
 };
 
 module.exports = {

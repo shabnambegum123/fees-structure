@@ -1,3 +1,4 @@
+const studentProfile = require("../Database/modal/studentprofile");
 const {
   createstudent,
   updatestudent,
@@ -106,6 +107,7 @@ const loginUser = async (req, res) => {
   let params = req.body;
   params.password = req.body.password;
   params.EmailId = req.body.EmailId;
+  
   let result = await tokenGenerate(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -123,10 +125,10 @@ const loginUser = async (req, res) => {
 };
 const verifyUser = async (req,res)=>{
   let params = req.headers;
- 
+       
   let result = await verifyToken(params);
 
-  if (result.status) {
+   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,

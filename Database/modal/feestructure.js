@@ -41,7 +41,10 @@ const feestructure = sequelize.define(
     TotalAmount: {
       type: DataTypes.BIGINT,
       allowNull: true,
-    },
+    },is_deleted: {
+      type : DataTypes.BOOLEAN,
+      defaultValue : false
+    }
   },
   {
     timestamps: true,
