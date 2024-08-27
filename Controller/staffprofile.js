@@ -9,7 +9,7 @@ const {
   deletestaffprofile,
   loginstaffProfile,staffToken,
   paymentmail
-} = require("../service/staffprofileservice");
+} = require("../service/staffProfileservice");
 
 const createstaff = async (req, res) => {
   const datas = req.body;
@@ -30,10 +30,9 @@ const createstaff = async (req, res) => {
 }
 
 const updatestaff = async (req,res) => {
-  let datas = {};
-  datas.ID = req.query.id;
-  datas.Name = req.body.Name;
-  const result = await updatestaffprofile(datas);
+  let  params = req.body
+  params.staffId = req.query.staffId;
+ const result = await updatestaffprofile(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -50,7 +49,9 @@ const updatestaff = async (req,res) => {
 };
 
 const liststaff = async (req,res) => {
-  const datas = req.body;
+  let datas = {}
+  datas.pageSize = req.query.pageSize
+  datas.page = req.query.page
   const result = await liststaffprofile(datas);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -81,19 +82,19 @@ const getByIdstaff = async (req,res) => {
       status: result.statusCode,
       message: result.message,
       data: result.data,
-    });
+    })
   }
-};
+}
 
 const deletestaff = async (req,res) => {
-  const datas = req.body;
-  const result = await deletestaffprofile(datas);
+  let data = req.query.staffId
+  const result = await deletestaffprofile(data);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
       data: result.data,
-    });
+    })
   } else {
     res.status(result.statusCode).json({
       status: result.statusCode,

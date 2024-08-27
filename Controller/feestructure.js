@@ -1,4 +1,4 @@
-const { sendMail } = require("../mail");
+
 const {
   createfeestructureService,
   updatefeestructureService,
@@ -6,7 +6,7 @@ const {
   listfeestructureService,
   deletefeestructureService,
   sendMailManagement
-} = require("../service/feestructureservice");
+} = require("../service/feeStructureservice");
 
 const createFeestructure = async (req, res) => {
   const datas = req.body;
@@ -27,11 +27,10 @@ const createFeestructure = async (req, res) => {
 };
 
 const updateFeestructure = async (req,res) => {
-  let datas = {};
-  datas.ID = req.query.id
-  datas.Name = req.body.Name
+  let  params = req.body
+  params.feestructureId = req.query.feestructureId;
 
-  const result = await updatefeestructureService(datas);
+  const result = await updatefeestructureService(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -48,8 +47,10 @@ const updateFeestructure = async (req,res) => {
 };
 
 const listFeestructure = async (req,res) => {
- 
-  const result = await listfeestructureService();
+  let datas = {}
+  datas.pageSize = req.query.pageSize
+  datas.page = req.query.page
+  const result = await listfeestructureService(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -84,8 +85,8 @@ const getByIdFeestructure = async (req,res) => {
 };
 
 const deleteFeestructure = async (req,res) => {
-  const datas = req.body;
-  const result = await deletefeestructureService(datas);
+  let data = req.query.feestructureId
+  const result = await deletefeestructureService(data);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -102,8 +103,8 @@ const deleteFeestructure = async (req,res) => {
 };
 
 const managementMail = async (req,res) =>{
-  //const datas = req.body;
-  const result = await sendMailManagement();
+  const datas = req.body;
+  const result = await sendMailManagement(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,

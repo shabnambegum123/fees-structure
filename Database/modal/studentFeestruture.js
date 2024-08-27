@@ -40,6 +40,10 @@ const studentFeestruture = sequelize.define(
       type: DataTypes.JSON,
       allowNull: true,
     },
+    is_deleted: {
+      type : DataTypes.BOOLEAN,
+      defaultValue : false
+    }
   },
   {
     timestamps: true,

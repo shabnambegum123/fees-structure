@@ -7,10 +7,13 @@ const feestructure = require("../Database/modal/feestructure");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const nodemailer = require("nodemailer");
 const { default: axios, all } = require("axios");
-const { sendMail } = require("../mail");
-const {generateToken} = require("../token");
-const { raw } = require("body-parser");
 
+const { generateToken } = require("../token");
+const { raw } = require("body-parser");
+const { axiosFunction } = require("../axios");
+const { pagaMetaService } = require("../helpers/pagination");
+const { string } = require("joi");
+// create student profile
 const createstudent = async (params) => {
   try {
     if (params.feestructureId) {
@@ -230,41 +233,32 @@ const createstudent = async (params) => {
   }
 };
 
+// update student profile
 const updatestudent = async (params) => {
-  let profileId = params.profileId;
- 
- 
-  let result = await studentProfile.update(
-    { Name: params.Name },
-    { where: { profileId: profileId } }
-  );
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "updated",
-      data: {},
-    };
-  } else {
-    return {
-      status: 400,
-      message: " not updated",
-      data: {},
-    };
-  }
-};
+  try {
+    if (params.password) {
+      params.password = await generatePassword(params.password);
+    }
+    var result = await studentProfile.update(params, {
+      where: { profileId: params.profileId },
+      returning: true,
+    });
 
-const liststudent = async (params) => {
-  let result = await studentProfile.findAll();
-
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "sended",
-      data: result,
-    };
-  } else {
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "updated",
+        data: {},
+      };
+    } else {
+      return {
+        status: 400,
+        message: " not updated",
+        data: {},
+      };
+    }
+  } catch (error) {
     return {
       status: 400,
       message: "error",
@@ -273,159 +267,259 @@ const liststudent = async (params) => {
   }
 };
 
-const getByIdstudent = async (params) => {
-  let profileId = params.profileId;
-  let result = await studentProfile.findOne({
-    where: { profileId: profileId },
-  });
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "sended",
-      data: result,
-    };
-  } else {
-    return {
-      statusCode: 404,
-      status: false,
-      message: "data not found",
-      data: {},
-    };
-  }
-};
+// list student profile and pagenation
+const liststudent = async (params) => {
+  try {
+    let result = await studentProfile.findAll({
+      offset: +params.page,
+      limit: +params.limit,
+      raw: true,
+    });
+    let profileId = params.profileId;
+    
+    if (!!params.profileId ) {
+       let totalData = (
+        await studentProfile.findOne({ where:{ profileId: profileId}})
+      ).length;
+      
+      if (result.length > 0) {
+        return {
+          statusCode: 200,
+          status: true,
+          message: "sended",
+          data: await pagaMetaService(
+            +params.page,
+            +params.limit,
+            result,
+            totalData
+          ),
+        };
+      } else {
+        return {
+          statusCode: 400,
+          status: false,
+          message: "data not found",
+          data: {},
+        };
+      }
+    } else {
+      
+      let totalData = (await studentProfile.findAll()).length;
 
-const deletestudent = async (params) => {
-  let profileId = params.profileId;
-  let result = await studentProfile.destroy({
-    where: { profileId: profileId },
-  });
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "deleted",
-      data: result,
-    };
-  } else {
+      if (result.length > 0) {
+        return {
+          statusCode: 200,
+          status: true,
+          message: "sended",
+          data: await pagaMetaService(
+            +params.page,
+            +params.limit,
+            result,
+            totalData
+          ),
+        };
+      } else {
+        return {
+          statusCode: 400,
+          status: false,
+          message: "data not found",
+          data: {},
+        };
+      }
+    }
+  } catch (error) {
+    console.log("qewgqewf", error);
     return {
       statusCode: 400,
       status: false,
-      message: "data not found",
+      message: "error",
+      data: error,
+    };
+  }
+};
+// get student by Id
+const getByIdstudent = async (params) => {
+  console.log(params);
+  try {
+    let profileId = params.profileId;
+    let result = await studentProfile.findOne({
+      where: { profileId: profileId },
+    });
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "sended",
+        data: result,
+      };
+    } else {
+      return {
+        statusCode: 404,
+        status: false,
+        message: "data not found",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
       data: {},
     };
   }
 };
 
-const tokenGenerate = async (params) => {
-  let password = params.password;
-  let EmailId = params.EmailId;
-  let allow = await studentProfile.findOne ({where:{is_suspended:true},raw:true})
-  if(allow){
-    return{
-      statusCode: 200,
-        status: true,
-        message: "you are suspended",
-        data: {}
-    }
-  }
-  let result = await studentProfile.findOne({
-    where: { EmailId: params.EmailId },
-    raw: true,
-  });
+// soft delete
 
-  if (result) {
-    let comparepass = await bcrypt.compare(password, result.password);
-    if (comparepass) {
-      let generateToken = jwt.sign(result, process.env.secretKey, {
-        expiresIn: "1D",
-      });
-      result.generateToken = generateToken;
+const deletestudent = async (params) => {
+  try {
+    let profileId = params.profileId;
+    let result = await studentProfile.update(
+      { is_deleted: true },
+      {
+        where: { profileId: profileId },
+      }
+    );
+    if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "login successful",
+        message: "deleted",
         data: result,
       };
     } else {
       return {
         statusCode: 400,
-        status: true,
-        message: "invalid password",
+        status: false,
+        message: "data not found",
         data: {},
       };
     }
-  } else {
+  } catch (error) {
     return {
-      statusCode: 400,
-      status: true,
-      message: "data not found",
+      status: 400,
+      message: "error",
       data: {},
     };
   }
 };
-const verifyToken = async (params) => {
-  let token = params.authorization;
-  
- var generatetoken = await generateToken(token);
- console.log("generatetoken", generatetoken);
-if (generatetoken.Role == "Student") {
-    var result = await studentFeestruture.findAll({
-      where: { studentFeestrutureId:generatetoken.studentFeestrutureId },
+
+// Login for student profile
+
+const tokenGenerate = async (params) => {
+  try {
+    let password = params.password;
+    let EmailId = params.EmailId;
+    let allow = await studentProfile.findOne({
+      where: { is_suspended: false },
       raw: true,
     });
-    console.log(result)
-    // if (result.length > 0) {
-    //   const mailsend = await sendMail(generatetoken.EmailId, result);
-    //   console.log("mailsend", mailsend);
-    //   if (mailsend) {
-    //     return {
-    //       statusCode: 200,
-    //       status: true,
-    //       message: "Email sent successfully",
-    //       data: {},
-    //     };
-    //   } else {
-    //     return {
-    //       statusCode: 400,
-    //       status: false,
-    //       message: "Something Went Wrong",
-    //       data: {},
-    //     };
-    //   }
-    // }
-    let url = "http://localhost:4000/send/Mail";
+    if (allow) {
+      var result = await studentProfile.findOne({
+        where: { EmailId: params.EmailId },
+        raw: true,
+      });
 
-  let sendData = await axios.post(url,{
-    result:result,
-    generatetoken : generatetoken.EmailId
-  })
-  console.log("ejkdvjqw"  , sendData)
+      if (result) {
+        let value = {
+          EmailId: result.EmailId,
+          Name: result.Name,
+          profileId: result.profileId,
+          Role: result.Role,
+        };
+        let comparepass = await bcrypt.compare(password, result.password);
+        if (comparepass) {
+          let generateToken = jwt.sign(value, process.env.secretKey, {
+            expiresIn: process.env.expiresIn,
+          });
+          result.generateToken = generateToken;
+          return {
+            statusCode: 200,
+            status: true,
+            message: "login successful",
+            data: result,
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "invalid password",
+            data: {},
+          };
+        }
+      } else {
+        return {
+          statusCode: 400,
+          status: true,
+          message: "data not found",
+          data: {},
+        };
+      }
+    } else {
+      return {
+        statusCode: 400,
+        status: true,
+        message: "you are suspended",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
   }
-  // if (result) {
-  //   return {
-  //     statusCode: 200,
-  //     status: true,
-  //     message: "success",
-  //     data: result,
-  //   };
-  // }
-  // if (generateToken) {
-  //   return {
-  //     statusCode: 200,
-  //     status: true,
-  //     message: "valid",
-  //     data: {},
-  //   };
-  // }
-  // else {
-  //   return {
-  //     statusCode: 400,
-  //     status: true,
-  //     message: "invalid",
-  //     data: {},
-  //   };
-  // }
+};
+// verify the token and send the mail to the student which has there fees structure
+const verifyToken = async (params) => {
+  try {
+    let studentFeestrutureId = params.studentFeestrutureId;
+
+    var result = await studentFeestruture.findAll({
+      where: { studentFeestrutureId: studentFeestrutureId },
+      raw: true,
+    });
+
+    let EmailId = params.EmailId;
+    console.log(EmailId);
+    let url = process.env.studentUrl;
+    const axios = await axiosFunction(result, url, EmailId);
+    if (axios) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "login successful",
+        data: {},
+      };
+    } else {
+      return {
+        statusCode: 400,
+        status: true,
+        message: "user not found",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+};
+
+const joinstudentIdService = async (params) => {
+  try {
+    let studentId = params.studentId;
+    var result = await stu;
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
 };
 
 module.exports = {
@@ -436,4 +530,5 @@ module.exports = {
   deletestudent,
   tokenGenerate,
   verifyToken,
+  joinstudentIdService,
 };

@@ -1,4 +1,4 @@
-const studentProfile = require("../Database/modal/studentprofile");
+//const studentProfile = require("../Database/modal/studentprofile");
 const {
   createstudent,
   updatestudent,
@@ -6,13 +6,12 @@ const {
   getByIdstudent,
   deletestudent,
   tokenGenerate,
-  verifyToken
+  verifyToken,
+  joinstudentIdService,
 } = require("../service/studentProfileservice");
-
 
 const createUser = async (req, res) => {
   let result = await createstudent(req.body);
-
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -29,10 +28,9 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  console.log("67788",req.user)
-  let params = req.body
+  let params = req.body;
   params.profileId = req.user.profileId;
-  console.log(params)
+
   const result = await updatestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -50,8 +48,8 @@ const updateUser = async (req, res) => {
 };
 
 const listUser = async (req, res) => {
-  //const datas = req.body;
-  const result = await liststudent();
+  let datas = req.query;
+  const result = await liststudent(datas);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -68,8 +66,10 @@ const listUser = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-  const datas = req.body;
-  const result = await getByIdstudent(datas);
+  let params = req.body;
+  params.profileId = req.user.profileId;
+  console.log(params.profileId)
+  const result = await getByIdstudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -86,8 +86,10 @@ const getById = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const datas = req.body;
-  const result = await deletestudent(datas);
+  let params = req.body;
+  params.profileId = req.user.profileId;
+  
+  const result = await deletestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -107,7 +109,7 @@ const loginUser = async (req, res) => {
   let params = req.body;
   params.password = req.body.password;
   params.EmailId = req.body.EmailId;
-  
+
   let result = await tokenGenerate(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -123,12 +125,13 @@ const loginUser = async (req, res) => {
     });
   }
 };
-const verifyUser = async (req,res)=>{
-  let params = req.headers;
-       
-  let result = await verifyToken(params);
-
-   if (result.status) {
+const verifyUser = async (req, res) => {
+ // let params = req.headers;
+  let params = req.body;
+ params.studentFeestrutureId  = req.user.studentFeestrutureId ;
+ params.EmailId = req.user.EmailId
+   let result = await verifyToken(params);
+ if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
@@ -141,7 +144,27 @@ const verifyUser = async (req,res)=>{
       data: result.data,
     });
   }
-}
+};
+
+const joinstudentId = async (req, res) => {
+  let params = req.query;
+
+  let result = await joinstudentIdService(params);
+
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+};
 module.exports = {
   createUser,
   updateUser,
@@ -149,5 +172,6 @@ module.exports = {
   getById,
   deleteUser,
   loginUser,
-  verifyUser
+  verifyUser,
+  joinstudentId,
 };

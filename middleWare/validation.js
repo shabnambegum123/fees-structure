@@ -1,122 +1,570 @@
 const joi = require("joi");
 // student profile
-const studentCreate = async (req, res) => {
-  var param = req.body;
-  let input = {
-    Name: joi.string().required(),
-    EmailId: joi.string().email().min(15).max(56).required(),
-    password: joi.string().required().min(6).max(10),
-    Role: joi.string().default("Student").required(),
-    Designation: joi.string().required(),
-    is_FirstGraduate: joi.string().required().default("true", "false"),
-    category: joi.string().required().default("BC", "general"),
-    currentYear: joi.string().require(),
-    feestructureId: joi.number().required(),
-    mobileNumber: joi.number().min(10).max(10).required(),
+
+const studentCreate = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      Name: joi.string().required(),
+      EmailId: joi.string().email().min(15).max(56).required(),
+      password: joi.string().min(6).max(10).required(),
+      Role: joi.string().required(),
+      Designation: joi.string().required(),
+      is_FirstGraduate: joi.string().required(),
+      category: joi.string().required(),
+      currentYear: joi.string().required(),
+      feestructureId: joi.number().required(),
+      mobileNumber: joi.number().min(10).required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+
+    let { error, value } = await profileValidate.validate(req.body, options);
+
+    
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
   }
-}
-
-const studentLogin = async () => {
-  EmailId = await joi.string().email().min(15).max(56).required();
-  password = await joi.string().required().min(6).max(10);
 };
 
-const updateStudent = async () => {
-  EmailId = await joi.string().email().min(15).max(56);
-  password = await joi.string().min(6).max(10);
-  Role = await joi.string().default("Student");
-  Designation = await joi.string();
-  is_FirstGraduate = await joi.string().default("true", "false");
-  category = await joi.string().default("BC", "general");
-  currentYear = await joi.string();
-  feestructureId = await joi.number();
-  mobileNumber = await joi.number().min(10).max(10);
+const studentLogin = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+     EmailId: await joi.string().email().min(12).required(),
+      password: await joi.string().required().min(6).max(10),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const studentId = async () => {
-  profileId = await joi.number().required();
+const updateStudent = async (req, res,next) => {
+  try {
+    let profileValidate = joi.object({
+      Name: joi.string(),
+      EmailId: joi.string().email().min(15).max(56),
+      password: joi.string().min(6).max(10),
+      Role: joi.string().default("Student"),
+      Designation: joi.string(),
+      is_FirstGraduate: joi.string(),
+      category: joi.string(),
+      currentYear: joi.string(),
+      feestructureId: joi.number(),
+      mobileNumber: joi.number().min(10),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+    else{
+      next()
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const deleteId = async () => {
-  is_deleted = await joi.boolean().required();
+const liststudentId = async (req, res,next) => {
+  try {
+    let profileValidate = joi.object({
+      page: joi.number().required(),
+      limit : joi.number().required()
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+    else{
+      next()
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
-const tokenValidationStudent = async () => {
-  token = joi
-    .string()
-    .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/);
+
+const deleteId = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      is_deleted: await joi.boolean().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const tokenValidationStudent = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      token: joi
+        .string()
+        .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
 // staff profile
 
-const staffCreate = async () => {
-  Name = await joi.string().required();
-  EmailId = await joi.string().email().min(15).max(56).required();
-  password = await joi.string().min(6).max(10).required();
-  Role = await joi.string().default("staff").required();
-  Designation = await joi.string().required();
+const staffCreate = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      Name: joi.string().required(),
+      EmailId: joi.string().email().min(15).max(56).required(),
+      password: joi.string().min(6).max(10).required(),
+      Role: joi.string().default("staff").required(),
+      Designation: joi.string().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const updateStaff = async () => {
-  Name = await joi.string();
-  EmailId = await joi.string().email().min(15).max(56);
-  password = await joi.string().min(6).max(10);
-  Role = await joi.string().default("staff");
-  Designation = await joi.string();
+const updateStaff = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      Name: joi.string(),
+      EmailId: joi.string().email().min(15).max(56),
+      password: joi.string().min(6).max(10),
+      Role: joi.string().default("staff"),
+      Designation: joi.string(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
-const staffId = async () => {
-  staffId = await joi.number().required();
+const staffId = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      staffId: joi.number().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const deleteStaff = async () => {
-  is_deleted = await joi.boolean().required();
+const deleteStaff = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      is_deleted: joi.boolean().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const loginStaff = async () => {
-  EmailId = await joi.string().email().min(15).max(56).required();
-  password = await joi.string().required().min(6).max(10);
+const loginStaff = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      EmailId: joi.string().email().min(15).max(56).required(),
+      password: joi.string().required().min(6).max(10),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
 };
 
-const tokenValidationStaff = async () => {
-  token = joi
-    .string()
-    .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/);
-}
+const tokenValidationStaff = async (req, res) => {
+  try {
+    let profileValidate = joi.object({
+      token: joi
+        .string()
+        .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
 // fee structure
 
-const createFee = async () => {
-  (Designation = await joi.string().required()(
-    (year = await joi.string().require())
-  )),
-    (TuitionFee = joi.number().required()),
-    (BookFee = joi.number().required()),
-    (BusFee = joi.number().required()),
-    (FirstGraduate_discount = joi.number().required()),
-    (Reserved_students_Discount = joi.number().required());
-}
+const createFee = async (req, res,next) => {
+  try {
+    let profileValidate = joi.object({
+      Designation: joi.string().required(),
+      year: joi.string().required(),
+      TuitionFee: joi.number().required(),
+      BookFee: joi.number().required(),
+      BusFee: joi.number().required(),
+      FirstGraduate_discount: joi.string().required(),
+      Reserved_students_Discount: joi.string().required(),
+    })
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+    else{
+      next()
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
 const updateFee = async () => {
-  (Designation = await joi.string()((year = await joi.string()))),
-    (TuitionFee = joi.number()),
-    (BookFee = joi.number()),
-    (BusFee = joi.number()),
-    (FirstGraduate_discount = joi.number()),
-    (Reserved_students_Discount = joi.number());
-}
+  try {
+    let profileValidate = joi.object({
+      Designation: joi.string(),
+      year: joi.string().require(),
+      TuitionFee: joi.number(),
+      BookFee: joi.number(),
+      BusFee: joi.number(),
+      FirstGraduate_discount: joi.number(),
+      Reserved_students_Discount: joi.number(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
 const getfeeId = async () => {
-  feestructureId = await joi.number().required();
-}
+  try {
+    let profileValidate = joi.object({
+      feestructureId: joi.number().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
 const deletefee = async () => {
-  is_deleted = await joi.boolean().required();
-}
+  try {
+    let profileValidate = joi.object({
+      is_deleted: joi.boolean().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 
 module.exports = {
   studentLogin,
   studentCreate,
   updateStudent,
-  studentId,
+  liststudentId,
   deleteId,
   staffCreate,
   updateStaff,

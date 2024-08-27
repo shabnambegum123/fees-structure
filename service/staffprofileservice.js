@@ -4,80 +4,50 @@ const { generatePassword } = require("../password/bcrypt");
 const jwt = require("jsonwebtoken");
 const { param } = require("../Router/router");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-const {generateToken} = require("../token");
+const { generateToken } = require("../token");
 const studentProfile = require("../Database/modal/studentprofile");
 const { default: axios, all } = require("axios");
-
+const { PendingMail,axiosFunction } = require("../axios");
+const { pagaMetaService } = require("../helpers/pagination");
+// create staffProfile
 const createstaffprofile = async (params) => {
-  let info = {
-    Name: params.Name,
-    EmailId: params.EmailId,
-    password: params.password,
-    Role: params.Role,
-    Designation: params.Designation,
-  };
-  info.password = await generatePassword(params.password);
-  let checkEmailExists = await staffprofile.findOne({
-    where: { EmailId: params.EmailId },
-  });
-  if (checkEmailExists) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: "EmailId already exist",
-      data: {},
+  try {
+    let info = {
+      Name: params.Name,
+      EmailId: params.EmailId,
+      password: params.password,
+      Role: params.Role,
+      Designation: params.Designation,
     };
-  }
-  let result = await staffprofile.create(info);
-  //staffId = result.max(staffId) + 1
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "created",
-      data: {},
-    };
-  } else {
-    return {
-      status: 400,
-      message: " not created",
-      data: {},
-    };
-  }
-};
-const updatestaffprofile = async (params) => {
-  let staffId = params.staffId;
-  let result = await staffprofile.update(
-    { Name: params.Name },
-    { where: { staffId: staffId } }
-  );
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "updated",
-      data: result,
-    };
-  } else {
-    return {
-      status: 400,
-      message: "not found",
-      data: {},
-    };
-  }
-};
-const liststaffprofile = async (params) => {
-  let staffId = params.staffId;
-  let result = await staffprofile.findAll({ where: { staffId: staffId } });
+    info.password = await generatePassword(params.password);
+    let checkEmailExists = await staffprofile.findOne({
+      where: { EmailId: params.EmailId },
+    });
+    if (checkEmailExists) {
+      return {
+        statusCode: 400,
+        status: false,
+        message: "EmailId already exist",
+        data: {},
+      };
+    }
+    let result = await staffprofile.create(info);
 
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "success",
-      data: result,
-    };
-  } else {
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "created",
+        data: {},
+      };
+    } else {
+      return {
+        status: 400,
+        message: " not created",
+        data: {},
+      };
+    }
+  } catch (error) {
     return {
       status: 400,
       message: "error",
@@ -85,85 +55,197 @@ const liststaffprofile = async (params) => {
     };
   }
 };
-const getByIdstaffprofile = async (params) => {
-  let staffId = params.staffId;
-  let result = await staffprofile.findOne({ where: { staffId: staffId } });
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "success",
-      data: result,
-    };
-  } else {
-    return {
-      status: 400,
-      message: "not found",
-      data: {},
-    };
-  }
-};
-const deletestaffprofile = async (params) => {
-  let staffId = params.staffId;
-  let result = await staffprofile.destroy({ where: { staffId: staffId } });
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "success",
-      data: result,
-    };
-  } else {
-    return {
-      status: 400,
-      message: "not found",
-      data: {},
-    };
-  }
-};
 
-const loginstaffProfile = async (params) => {
-  let EmailId = params.EmailId;
-  let password = params.password;
-  let result = await staffprofile.findOne({
-    where: { EmailId: params.EmailId },
-    raw: true,
-  });
+// update Profile
+const updatestaffprofile = async (params) => {
+  try {
+    if (params.password) {
+      params.password = await generatePassword(params.password);
+    }
 
-  if (result) {
-    let comparepass = await bcrypt.compare(password, result.password);
-    if (comparepass) {
-      let generateToken = jwt.sign(result, process.env.secretKey);
-      result.generateToken = generateToken;
+    var result = await staffprofile.update(params, {
+      where: { staffId: params.staffId },
+      returning: true,
+    });
+    if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "Login successful",
+        message: "updated",
         data: result,
       };
     } else {
       return {
-        statusCode: 400,
-        status: true,
-        message: "Invelid password",
+        status: 400,
+        message: "not found",
         data: {},
       };
     }
-  } else {
+  } catch (error) {
     return {
-      statusCode: 400,
-      status: true,
-      message: "data not found",
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+};
+// list profile and pagenation
+const liststaffprofile = async (params) => {
+  try {
+
+    console.log("params--->" , params)
+    let result = await staffprofile.findAll();
+
+    let passData = {
+      page: params.page,
+      limit: params.limit,
+      data: result,
+    };
+
+    pagaMetaService(passData);
+
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "success",
+        data: result,
+      };
+    } else {
+      return {
+        status: 400,
+        message: "error",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+};
+// getId by list
+const getByIdstaffprofile = async (params) => {
+  try {
+    let staffId = params.staffId;
+    let result = await staffprofile.findOne({ where: { staffId: staffId } });
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "success",
+        data: result,
+      };
+    } else {
+      return {
+        status: 400,
+        message: "not found",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+};
+// soft delete
+
+const deletestaffprofile = async (params) => {
+  try {
+    let staffId = params.staffId;
+    let result = await staffprofile.destroy(
+      { staffId: params.staffId },
+      { where: { is_deleted: is_deleted } }
+    );
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "success",
+        data: result,
+      };
+    } else {
+      return {
+        status: 400,
+        message: "not found",
+        data: {},
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
       data: {},
     };
   }
 };
 
+// login Profile
+const loginstaffProfile = async (params) => {
+  try {
+    let EmailId = params.EmailId;
+    let password = params.password;
+    let allow = await staffprofile.findOne({ where: { is_deleted: false } });
+    if (allow) {
+      var result = await staffprofile.findOne({
+        where: { EmailId: params.EmailId },
+        raw: true,
+      });
+
+      if (result) {
+        let value = {
+          EmailId: result.EmailId,
+          Name: result.Name,
+          staffId: result.staffId,
+        };
+        let comparepass = await bcrypt.compare(password, result.password);
+        if (comparepass) {
+          let generateToken = jwt.sign(value, process.env.secretKey, {
+            expiresIn: process.env.expiresIn,
+          });
+          result.generateToken = generateToken;
+          return {
+            statusCode: 200,
+            status: true,
+            message: "Login successful",
+            data: result,
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "Invelid password",
+            data: {},
+          };
+        }
+      } else {
+        return {
+          statusCode: 400,
+          status: true,
+          message: "data not found",
+          data: {},
+        };
+      }
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
+  }
+};
+
+// To add the fineAmount in studentfeestructure in json format ... if fineAmount already exists push the fineAmount in the array and also update the amount the in the totalAmount column
 const staffToken = async (param) => {
-  let token = param.token;
-   let generatetoken = await generateToken(token)
-  if (generatetoken.Role === "staff" ) {
-   
+  try {
+    let token = param.token;
+    let generatetoken = await generateToken(token);
     var result = await studentFeestruture.findOne({
       where: { studentId: param.studentId },
       raw: true,
@@ -172,15 +254,33 @@ const staffToken = async (param) => {
       let updatestudentFeeStructure = await studentFeestruture.update(
         { fineAmount: param.fineAmount },
         { where: { studentId: param.studentId } }
-      )
+      );
 
       if (updatestudentFeeStructure) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "updated",
-          data: {},
-        };
+        var amount = await studentFeestruture.findOne({
+          where: { studentId: param.studentId },
+          raw: true,
+        });
+
+        let finalTotalAmount = await studentFeestruture.update(
+          { TotalAmount: amount.fineAmount.Amount + amount.TotalAmount },
+          { where: { studentId: param.studentId } }
+        );
+        if (finalTotalAmount) {
+          return {
+            statusCode: 200,
+            status: true,
+            message: "updated",
+            data: {},
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "error",
+            data: {},
+          };
+        }
       } else {
         return {
           statusCode: 400,
@@ -196,7 +296,6 @@ const staffToken = async (param) => {
         { where: { studentId: param.studentId } }
       );
       if (updatestudentFeeStructure) {
-        
         var amount = await studentFeestruture.findOne({
           where: { studentId: param.studentId },
           raw: true,
@@ -235,50 +334,80 @@ const staffToken = async (param) => {
         };
       }
     }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data: {},
+    };
   }
 };
+// if fees is delay staff should send the mail to student  that  they have pending
+const paymentmail = async () => {
+  try {
+    var result = await studentFeestruture.findAll({
+      where: { paidStatus: "pending" },
+      raw: true,
+    });
 
-const paymentmail = async () =>{
-    const result = await studentFeestruture.findAll({where:{paidStatus:'pending'},raw:true})
-    if(result){
-      var map = result.map((x)=>{
-        x = x.studentId
-        return x
-      })
-      console.log(map)
-      const find = await studentProfile.findOne({where:{studentFeestrutureId:map},raw:true})
-      if(find){
-      //  let amount = await result.TotalAmount
-      //   let url = "http://localhost:4000/mail/send";
-      // let sendData = await axios.post(url,{
-      //    find:find.EmailId,
-      //    result : amount
-      //   })
-      //   console.log('jhqsbxj',sendData)
-      return{
-        statusCode: 200,
+    if (result) {
+      for (let item of result) {
+        
+        var find = await studentProfile.findOne({
+          where: { studentId: item.studentId },
+          raw: true,
+        });
+
+        if (find) {
+
+          let mailObject = {
+            to: find.EmailId,
+            data: item.TotalAmount,
+          }
+          let url = process.env.pendingUrl;
+          const axios = await axiosFunction(mailObject,url);
+
+          // if (axios) {
+          //   return {
+          //     statusCode: 200,
+          //     status: true,
+          //     message: "sended",
+          //     data: {},
+          //   };
+          // } else {
+          //   return {
+          //     statusCode: 400,
+          //     status: true,
+          //     message: "error",
+          //     data: {},
+          //   };
+          // }
+        } else {
+          return {
+            statusCode: 400,
             status: true,
-            message: "updated",
-            data: find
+            message: "error",
+            data: {},
+          };
+        }
       }
-     }
-      return{
-        statusCode: 200,
-            status: true,
-            message: "sended",
-            data:{}
-      }
-    }
-    else{
+    } else {
       return {
         statusCode: 400,
         status: true,
         message: "error",
         data: {},
-      }
+      };
     }
-}
-
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: true,
+      message: "error",
+      data: {},
+    };
+  }
+};
 
 module.exports = {
   createstaffprofile,
@@ -288,5 +417,5 @@ module.exports = {
   deletestaffprofile,
   loginstaffProfile,
   staffToken,
-  paymentmail
+  paymentmail,
 };

@@ -24,11 +24,10 @@ const createstudentFee = async (req, res) => {
 };
 
 const updatestudentFee = async (req,res) => {
-  let datas = {};
-  datas.studentId = req.query.studentId;
-  datas.Designation = req.body.Designation;
+  let  params = req.body
+  params.studentFeestrutureId = req.query.studentFeestrutureId;
 
-  const result = await updatestudentFeeStructure(datas);
+  const result = await updatestudentFeeStructure(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -45,7 +44,10 @@ const updatestudentFee = async (req,res) => {
 };
 
 const liststudentfee = async (req,res) => {
-  const datas = req.query;
+  let datas = {}
+  datas.pageSize = req.query.pageSize
+  datas.page = req.query.page
+
   const result = await liststudentFeestructure(datas);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -81,8 +83,8 @@ const getByIdstudentFee = async (req,res) => {
 };
 
 const deletestudentFee = async (req,res) => {
-  const datas = req.body;
-  const result = await deletestudentFeeStructure(datas);
+ let data = req.query.liststudentFeestructureId
+  const result = await deletestudentFeeStructure(data);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
