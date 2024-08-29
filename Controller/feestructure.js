@@ -27,6 +27,7 @@ const createFeestructure = async (req, res) => {
 };
 
 const updateFeestructure = async (req,res) => {
+ 
   let  params = req.body
   params.feestructureId = req.query.feestructureId;
 
@@ -47,9 +48,8 @@ const updateFeestructure = async (req,res) => {
 };
 
 const listFeestructure = async (req,res) => {
-  let datas = {}
-  datas.pageSize = req.query.pageSize
-  datas.page = req.query.page
+  let datas = req.query
+  
   const result = await listfeestructureService(datas);
   if (result.status) {
     res.status(result.statusCode).json({

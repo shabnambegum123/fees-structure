@@ -27,8 +27,6 @@ const studentCreate = async (req, res, next) => {
 
     let { error, value } = await profileValidate.validate(req.body, options);
 
-    
-
     if (error && Object.keys(error).length > 0) {
       return res.json({
         statusCode: 400,
@@ -49,7 +47,7 @@ const studentCreate = async (req, res, next) => {
 const studentLogin = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-     EmailId: await joi.string().email().min(12).required(),
+      EmailId: await joi.string().email().min(12).required(),
       password: await joi.string().required().min(6).max(10),
     });
 
@@ -80,7 +78,7 @@ const studentLogin = async (req, res, next) => {
   }
 };
 
-const updateStudent = async (req, res,next) => {
+const updateStudent = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       Name: joi.string(),
@@ -110,9 +108,8 @@ const updateStudent = async (req, res,next) => {
         statusCode: 400,
         message: error.message,
       });
-    }
-    else{
-      next()
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -123,11 +120,11 @@ const updateStudent = async (req, res,next) => {
   }
 };
 
-const liststudentId = async (req, res,next) => {
+const liststudentId = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      page: joi.number().required(),
-      limit : joi.number().required()
+      page: joi.number(),
+      limit: joi.number(),
     });
 
     let options = {
@@ -145,72 +142,8 @@ const liststudentId = async (req, res,next) => {
         statusCode: 400,
         message: error.message,
       });
-    }
-    else{
-      next()
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-    };
-  }
-};
-
-const deleteId = async (req, res) => {
-  try {
-    let profileValidate = joi.object({
-      is_deleted: await joi.boolean().required(),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.body, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
-        statusCode: 400,
-        message: error.message,
-      });
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-    };
-  }
-};
-const tokenValidationStudent = async (req, res) => {
-  try {
-    let profileValidate = joi.object({
-      token: joi
-        .string()
-        .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.body, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
-        statusCode: 400,
-        message: error.message,
-      });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -223,13 +156,13 @@ const tokenValidationStudent = async (req, res) => {
 
 // staff profile
 
-const staffCreate = async (req, res) => {
+const staffCreate = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       Name: joi.string().required(),
-      EmailId: joi.string().email().min(15).max(56).required(),
-      password: joi.string().min(6).max(10).required(),
-      Role: joi.string().default("staff").required(),
+      EmailId: joi.string().email().min(9).required(),
+      password: joi.string().min(10).required(),
+      Role: joi.string().required(),
       Designation: joi.string().required(),
     });
 
@@ -248,6 +181,8 @@ const staffCreate = async (req, res) => {
         statusCode: 400,
         message: error.message,
       });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -262,9 +197,9 @@ const updateStaff = async (req, res) => {
   try {
     let profileValidate = joi.object({
       Name: joi.string(),
-      EmailId: joi.string().email().min(15).max(56),
-      password: joi.string().min(6).max(10),
-      Role: joi.string().default("staff"),
+      EmailId: joi.string().email().min(9),
+      password: joi.string().min(6).min(10),
+      Role: joi.string(),
       Designation: joi.string(),
     });
 
@@ -292,10 +227,11 @@ const updateStaff = async (req, res) => {
     };
   }
 };
-const staffId = async (req, res) => {
+const listId = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      staffId: joi.number().required(),
+      page: joi.number(),
+      limit: joi.number(),
     });
 
     let options = {
@@ -313,37 +249,8 @@ const staffId = async (req, res) => {
         statusCode: 400,
         message: error.message,
       });
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-    };
-  }
-};
-
-const deleteStaff = async (req, res) => {
-  try {
-    let profileValidate = joi.object({
-      is_deleted: joi.boolean().required(),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.body, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
-        statusCode: 400,
-        message: error.message,
-      });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -357,41 +264,8 @@ const deleteStaff = async (req, res) => {
 const loginStaff = async (req, res) => {
   try {
     let profileValidate = joi.object({
-      EmailId: joi.string().email().min(15).max(56).required(),
-      password: joi.string().required().min(6).max(10),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.body, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
-        statusCode: 400,
-        message: error.message,
-      });
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-    };
-  }
-};
-
-const tokenValidationStaff = async (req, res) => {
-  try {
-    let profileValidate = joi.object({
-      token: joi
-        .string()
-        .regex(/^[A-Za-z0-9-_]+.[A-Za-z0-9-_]+.[A-Za-z0-9-_.+/=]*$/),
+      EmailId: await joi.string().email().min(12).required(),
+      password: await joi.string().required().min(6).max(10),
     });
 
     let options = {
@@ -421,7 +295,7 @@ const tokenValidationStaff = async (req, res) => {
 
 // fee structure
 
-const createFee = async (req, res,next) => {
+const createFee = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       Designation: joi.string().required(),
@@ -431,7 +305,7 @@ const createFee = async (req, res,next) => {
       BusFee: joi.number().required(),
       FirstGraduate_discount: joi.string().required(),
       Reserved_students_Discount: joi.string().required(),
-    })
+    });
 
     let options = {
       basic: {
@@ -448,9 +322,8 @@ const createFee = async (req, res,next) => {
         statusCode: 400,
         message: error.message,
       });
-    }
-    else{
-      next()
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -461,11 +334,11 @@ const createFee = async (req, res,next) => {
   }
 };
 
-const updateFee = async () => {
+const updateFee = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       Designation: joi.string(),
-      year: joi.string().require(),
+      year: joi.string(),
       TuitionFee: joi.number(),
       BookFee: joi.number(),
       BusFee: joi.number(),
@@ -488,6 +361,8 @@ const updateFee = async () => {
         statusCode: 400,
         message: error.message,
       });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -498,10 +373,11 @@ const updateFee = async () => {
   }
 };
 
-const getfeeId = async () => {
+const listById = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      feestructureId: joi.number().required(),
+      page: joi.number(),
+      limit: joi.number(),
     });
 
     let options = {
@@ -519,6 +395,8 @@ const getfeeId = async () => {
         statusCode: 400,
         message: error.message,
       });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -527,12 +405,21 @@ const getfeeId = async () => {
       message: error.message,
     };
   }
-};
+}
 
-const deletefee = async () => {
+// studentFeeStructure
+
+const updateFeestructureValidation = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      is_deleted: joi.boolean().required(),
+     
+      Designation: joi.string(),
+      year: params.joi.string(),
+      TuitionFee: joi.number(),
+      BookFee: joi.number(),
+      BusFee: joi.number(),
+      FirstGraduate_discount: joi.string(),
+      Reserved_students_Discount :joi.string()
     });
 
     let options = {
@@ -550,6 +437,8 @@ const deletefee = async () => {
         statusCode: 400,
         message: error.message,
       });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -558,23 +447,56 @@ const deletefee = async () => {
       message: error.message,
     };
   }
-};
+}
+
+
+const listByIdFee = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      page: joi.number(),
+      limit: joi.number(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+}
+
 
 module.exports = {
   studentLogin,
   studentCreate,
   updateStudent,
   liststudentId,
-  deleteId,
   staffCreate,
   updateStaff,
-  staffId,
-  deleteStaff,
+  listId,
+  updateFeestructureValidation,
   loginStaff,
-  tokenValidationStaff,
-  tokenValidationStudent,
+  listByIdFee,
   createFee,
   updateFee,
-  getfeeId,
-  deletefee,
+  listById,
 };

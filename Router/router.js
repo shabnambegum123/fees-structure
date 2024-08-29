@@ -1,6 +1,21 @@
 const router = require("express").Router();
 const { verifyToken, verifyRole } = require("../middleWare/Authentication");
-const {studentLogin,studentCreate,updateStudent,liststudentId,deleteId,staffCreate,updateStaff,staffId,deleteStaff,loginStaff,tokenValidationStudent,tokenValidationStaff,createFee,updateFee,getfeeId,deletefee} = require("../middleWare/validation")
+const {
+  studentLogin,
+  studentCreate,
+  updateStudent,
+  liststudentId,
+  staffCreate,
+  updateStaff,
+  listId,
+  updateFeestructureValidation,
+  loginStaff,
+  listByIdFee,
+  createFee,
+  updateFee,
+  listById,
+  verifyRoleFee
+} = require("../middleWare/validation");
 const {
   createUser,
   updateUser,
@@ -9,7 +24,7 @@ const {
   deleteUser,
   loginUser,
   verifyUser,
-} = require("../Controller/studentProfile")
+} = require("../Controller/studentProfile");
 
 const {
   createFeestructure,
@@ -17,7 +32,7 @@ const {
   deleteFeestructure,
   getByIdFeestructure,
   listFeestructure,
-  managementMail
+  managementMail,
 } = require("../Controller/feestructure");
 
 const {
@@ -36,63 +51,62 @@ const {
   deletestaff,
   loginstaff,
   verifystaffToken,
-  mailsend
+  mailsend,
 } = require("../Controller/staffprofile");
 
 // student profile
 router.post("/create/Profile", [verifyToken], [studentCreate], createUser);
 
-router.post("/login/user",[studentLogin],loginUser)
-router.put("/update/user",[verifyToken , verifyRole],[updateStudent],updateUser)
-router.get("/student/list", [verifyToken], listUser);
-router.get("/byId", [verifyToken], getById)
-router.delete("/delete/user", [verifyToken], deleteUser)
-router.get("/token/check",[verifyToken], verifyUser)
-;
+router.post("/login/user", [studentLogin], loginUser);
+router.put(
+  "/update/user",
+  [verifyToken, verifyRole],
+  [updateStudent],
+  updateUser
+);
+router.get("/student/list", [verifyToken], [liststudentId], listUser);
+router.get("/byId", [verifyToken], getById);
+router.delete("/delete/user", [verifyToken], deleteUser);
+router.get("/token/check", [verifyToken], verifyUser);
 // fees structure
-router.post("/create/feestructure",[verifyToken],[createFee], createFeestructure)
-router.put("/update/user",[verifyToken], updateFeestructure)
-router.get("/list/fee",[verifyToken], listFeestructure)
-router.get("/byId",[getfeeId],[verifyToken], getByIdFeestructure)
-router.delete("/delete",[deletefee],[verifyToken], deleteFeestructure)
-router.get('/send/management',[verifyToken],managementMail)
+router.post(
+  "/create/feestructure",
+  [verifyToken],
+  [createFee],
+  createFeestructure
+);
+router.put("/update/user", [verifyToken], [updateFee], updateFeestructure);
+router.get("/list/fee", [verifyToken], [listById], listFeestructure);
+router.get("/byId", [verifyToken], getByIdFeestructure);
+router.delete("/delete", [verifyToken], deleteFeestructure);
+router.get("/send/management", [verifyToken], managementMail);
 
 // studentFeeStructure
-router.post(
-  "/create/studentfee",
-  [verifyToken, verifyRole],
-  createstudentFee
-);
+
+
+  router.post(
+    "/create/studentfee",
+    [verifyToken, verifyRole],
+    createstudentFee
+  )
 router.put(
   "/update/studentfee",
-  [verifyToken, verifyRole],
+  [verifyToken],
+  [updateFeestructureValidation],
   updatestudentFee
 );
-router.get(
-  "/getId/studentfee",
-  [verifyToken, verifyRole],
-  getByIdstudentFee
-);
-router.get(
-  "/list/studentfee",
-  [verifyToken, verifyRole],
-  liststudentfee
-);
-router.delete(
-  "/delete/studentfee",
-  [verifyToken, verifyRole],
-  deletestudentFee
-)
+router.get("/getId/studentfee", [verifyToken], getByIdstudentFee);
+router.get("/list/studentfee", [verifyToken], [listByIdFee], liststudentfee);
+router.delete("/delete/studentfee", [verifyToken], deletestudentFee);
 
 // staff profile
-router.post("/create/staffee", [verifyToken, verifyRole],[staffCreate], createstaff);
-router.put("/update/staffee", updatestaff);
-router.get("/getId/staffee", [verifyToken, verifyRole],[staffId], getByIdstaff);
-router.get("/list/staffee", liststaff);
-router.delete("/delete/staffee", [verifyToken, verifyRole],[deleteStaff], deletestaff);
-router.post("/login/staff", loginstaff)
-router.get("/verify/token",  verifystaffToken)
-router.get("/payment/mail",mailsend)
+router.post("/create/staffee", [verifyToken], [staffCreate], createstaff);
+router.put("/update/staffee", [verifyToken], [updateStaff], updatestaff);
+router.get("/getId/staffee", [verifyToken], getByIdstaff);
+router.get("/list/staffee", [verifyToken], [listId], liststaff);
+router.delete("/delete/staffee", [verifyToken], deletestaff);
+router.post("/login/staff", [loginStaff], loginstaff);
+router.get("/verify/token", [verifyToken], verifystaffToken)
+router.get("/payment/mail", [verifyToken], mailsend);
 
-
-module.exports = router
+module.exports = router;

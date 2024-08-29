@@ -133,37 +133,81 @@ const deletestudentFeeStructure = async (params) => {
 // list fees structure and pagetion
 const liststudentFeestructure = async (params) => {
   try {
-    let page = +params.page;
-    let pageSize = +params.pageSize;
-    let offSet = (page - 1) * pageSize;
+    let whereQuery = {};
 
-    let result = await studentFeestruture.findAll({
-      limit: pageSize,
-      offSet: offSet,
+    if (params.profileId) {
+      whereQuery.profileId = params.profileId;
+    }
+    
+
+    let result = await studentProfile.findAll({
+       where: whereQuery,
+      limit: +params.limit,
+      offset: (params?.page - 1) * params?.limit,
     });
-    if (result) {
+
+    if (result.length > 0) {
       return {
         statusCode: 200,
         status: true,
         message: "sended",
-        data: result,
+        data: await pagaMetaService(
+          +params.page,
+          +params.limit,
+          result,
+          result.length
+        ),
       };
     } else {
       return {
-        statusCode: 404,
+        statusCode: 400,
         status: false,
-        message: "not found",
+        message: "data not found",
         data: {},
       };
     }
   } catch (error) {
+    console.log("qewgqewf", error);
     return {
-      status: 400,
+      statusCode: 400,
+      status: false,
       message: "error",
-      data: {},
+      data: error,
     };
   }
-};
+}
+
+// get student by Id // cmmand
+// const getByIdstudent = async (params) => {
+//   console.log(params);
+//   try {
+//     let profileId = params.profileId;
+//     let result = await studentProfile.findOne({
+//       where: { profileId: profileId },
+//     });
+//     if (result) {
+//       return {
+//         statusCode: 200,
+//         status: true,
+//         message: "sended",
+//         data: result,
+//       };
+//     } else {
+//       return {
+//         statusCode: 404,
+//         status: false,
+//         message: "data not found",
+//         data: {},
+//       };
+//     }
+//   } catch (error) {
+//     return {
+//       status: 400,
+//       message: "error",
+//       data: {},
+//     };
+//   }
+// };
 module.exports = {
   liststudentFeestructure,
   createstudentFeeStructure,

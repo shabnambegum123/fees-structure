@@ -49,9 +49,8 @@ const updatestaff = async (req,res) => {
 };
 
 const liststaff = async (req,res) => {
-  let datas = {}
-  datas.pageSize = req.query.pageSize
-  datas.page = req.query.page
+  let params = req.body;
+  params.profileId = req.user.profileId
   const result = await liststaffprofile(datas);
   if (result.status) {
     res.status(result.statusCode).json({

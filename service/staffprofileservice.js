@@ -92,37 +92,46 @@ const updatestaffprofile = async (params) => {
 // list profile and pagenation
 const liststaffprofile = async (params) => {
   try {
+    let whereQuery = {};
 
-    console.log("params--->" , params)
-    let result = await staffprofile.findAll();
+    if (params.profileId) {
+      whereQuery.profileId = params.profileId;
+    }
+    
 
-    let passData = {
-      page: params.page,
-      limit: params.limit,
-      data: result,
-    };
+    let result = await staffprofile.findAll({
+       where: whereQuery,
+      limit: +params.limit,
+      offset: (params?.page - 1) * params?.limit,
+    });
 
-    pagaMetaService(passData);
-
-    if (result) {
+    if (result.length > 0) {
       return {
         statusCode: 200,
         status: true,
-        message: "success",
-        data: result,
+        message: "sended",
+        data: await pagaMetaService(
+          +params.page,
+          +params.limit,
+          result,
+          result.length
+        ),
       };
     } else {
       return {
-        status: 400,
-        message: "error",
+        statusCode: 400,
+        status: false,
+        message: "data not found",
         data: {},
       };
     }
   } catch (error) {
+    console.log("qewgqewf", error);
     return {
-      status: 400,
+      statusCode: 400,
+      status: false,
       message: "error",
-      data: {},
+      data: error,
     };
   }
 };
@@ -244,12 +253,7 @@ const loginstaffProfile = async (params) => {
 // To add the fineAmount in studentfeestructure in json format ... if fineAmount already exists push the fineAmount in the array and also update the amount the in the totalAmount column
 const staffToken = async (param) => {
   try {
-    let token = param.token;
-    let generatetoken = await generateToken(token);
-    var result = await studentFeestruture.findOne({
-      where: { studentId: param.studentId },
-      raw: true,
-    });
+    
     if (result.fineAmount === null) {
       let updatestudentFeeStructure = await studentFeestruture.update(
         { fineAmount: param.fineAmount },

@@ -80,32 +80,46 @@ const updatefeestructureService = async (params) => {
 // list Profile and pagenation
 const listfeestructureService = async (params) => {
   try {
-    let page = +params.page;
-    let pageSize = +params.pageSize;
-    let offSet = (page - 1) * pageSize;
-    let result = await feestructure.findAll({
-      limit: pageSize,
-      offSet: offSet,
-    })
-    if (result) {
+    let whereQuery = {};
+
+    if (params.profileId) {
+      whereQuery.profileId = params.profileId;
+    }
+    
+
+    let result = await studentProfile.findAll({
+       where: whereQuery,
+      limit: +params.limit,
+      offset: (params?.page - 1) * params?.limit,
+    });
+
+    if (result.length > 0) {
       return {
         statusCode: 200,
         status: true,
-        message: "fees amount",
-        data: result,
+        message: "sended",
+        data: await pagaMetaService(
+          +params.page,
+          +params.limit,
+          result,
+          result.length
+        ),
       };
     } else {
       return {
-        status: 400,
-        message: "not found",
+        statusCode: 400,
+        status: false,
+        message: "data not found",
         data: {},
       };
     }
   } catch (error) {
+    console.log("qewgqewf", error);
     return {
-      status: 400,
+      statusCode: 400,
+      status: false,
       message: "error",
-      data: {},
+      data: error,
     };
   }
 };

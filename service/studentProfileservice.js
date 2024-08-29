@@ -270,62 +270,38 @@ const updatestudent = async (params) => {
 // list student profile and pagenation
 const liststudent = async (params) => {
   try {
-    let result = await studentProfile.findAll({
-      offset: +params.page,
-      limit: +params.limit,
-      raw: true,
-    });
-    let profileId = params.profileId;
-    
-    if (!!params.profileId ) {
-       let totalData = (
-        await studentProfile.findOne({ where:{ profileId: profileId}})
-      ).length;
-      
-      if (result.length > 0) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "sended",
-          data: await pagaMetaService(
-            +params.page,
-            +params.limit,
-            result,
-            totalData
-          ),
-        };
-      } else {
-        return {
-          statusCode: 400,
-          status: false,
-          message: "data not found",
-          data: {},
-        };
-      }
-    } else {
-      
-      let totalData = (await studentProfile.findAll()).length;
+    let whereQuery = {};
 
-      if (result.length > 0) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "sended",
-          data: await pagaMetaService(
-            +params.page,
-            +params.limit,
-            result,
-            totalData
-          ),
-        };
-      } else {
-        return {
-          statusCode: 400,
-          status: false,
-          message: "data not found",
-          data: {},
-        };
-      }
+    if (params.profileId) {
+      whereQuery.profileId = params.profileId;
+    }
+    
+
+    let result = await studentProfile.findAll({
+       where: whereQuery,
+      limit: +params.limit,
+      offset: (params?.page - 1) * params?.limit,
+    });
+
+    if (result.length > 0) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "sended",
+        data: await pagaMetaService(
+          +params.page,
+          +params.limit,
+          result,
+          result.length
+        ),
+      };
+    } else {
+      return {
+        statusCode: 400,
+        status: false,
+        message: "data not found",
+        data: {},
+      };
     }
   } catch (error) {
     console.log("qewgqewf", error);
@@ -375,7 +351,7 @@ const deletestudent = async (params) => {
   try {
     let profileId = params.profileId;
     let result = await studentProfile.update(
-      { is_deleted: true },
+      { is_deleted: "true" },
       {
         where: { profileId: profileId },
       }

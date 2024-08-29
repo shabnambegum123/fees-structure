@@ -3,14 +3,13 @@ const studentFeestruture = require("../Database/modal/studentFeestruture");
 const studentProfile = require("../Database/modal/studentprofile");
 const joi = require("joi");
 const staffprofile = require("../Database/modal/staffprofile");
+const { verifyRoleFee } = require("../Router/router");
 
 const verifyToken = async (req, res, next) => {
   try {
     var token = req.headers.authorization;
 
     var Token = await jwt.verify(token, process.env.secretKey);
-
-    console.log("weeKsdage", Token);
 
     if (Token.profileId) {
       const allow = await studentProfile.findOne({
@@ -54,12 +53,10 @@ const verifyToken = async (req, res, next) => {
 
 // authorization
 
-const verifyRole = async () => {
-  try {
-   console.log()
-  } catch (error) {
-    console.log(error);
-  }
-};
+const verifyRole = async (req,res) => {
+
+  
+}
+
 
 module.exports = { verifyToken, verifyRole };
