@@ -1,10 +1,12 @@
 const express = require("express");
-let app = express()
+let app = express();
 
 const bodyparser = require("body-parser");
-app.use(bodyparser.json())
 
-const dotenv = require("dotenv")
+app.use(bodyparser.json());
+
+const dotenv = require("dotenv");
+
 dotenv.config();
 
 const router = require("./Router/router")
@@ -15,10 +17,6 @@ require("./Database/modal/index");
 
 let PORT = process.env.PORT;
 
-app.post("/getData", (req, res) => {
-  console.log("Data", req.body)
-});
-
 app.listen(PORT, () => {
-  console.log(`server is looking for ${PORT}`);
+  console.log(`server is looking for ${PORT}`)
 })

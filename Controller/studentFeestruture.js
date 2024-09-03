@@ -26,7 +26,7 @@ const createstudentFee = async (req, res) => {
 const updatestudentFee = async (req,res) => {
   let  params = req.body
   params.studentFeestrutureId = req.query.studentFeestrutureId;
-
+   console.log("hrttyyy")
   const result = await updatestudentFeeStructure(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -44,11 +44,9 @@ const updatestudentFee = async (req,res) => {
 };
 
 const liststudentfee = async (req,res) => {
-  let datas = {}
-  datas.pageSize = req.query.pageSize
-  datas.page = req.query.page
+  let params = req.query;
 
-  const result = await liststudentFeestructure(datas);
+  const result = await liststudentFeestructure(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -65,8 +63,9 @@ const liststudentfee = async (req,res) => {
 };
 
 const getByIdstudentFee = async (req,res) => {
-  const datas = req.body;
-  const result = await getByIdstudentFeeStructure(datas);
+  let params = req.body;
+  params.studentFeestrutureId = req.query.studentFeestrutureId;
+  const result = await getByIdstudentFeeStructure(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -83,7 +82,7 @@ const getByIdstudentFee = async (req,res) => {
 };
 
 const deletestudentFee = async (req,res) => {
- let data = req.query.liststudentFeestructureId
+ let data = req.query
   const result = await deletestudentFeeStructure(data);
   if (result.status) {
     res.status(result.statusCode).json({

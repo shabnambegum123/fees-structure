@@ -123,8 +123,43 @@ const updateStudent = async (req, res, next) => {
 const liststudentId = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      page: joi.number(),
-      limit: joi.number(),
+      page: joi.number().required(),
+      limit: joi.number().required(),
+      profileId: joi.number(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.query, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
+const validatePassword = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      newPassword: joi.string().required(), // test123@
+      confirmPassword: joi.string().required(),
+      oldPassword: joi.string().required(), // test123
     });
 
     let options = {
@@ -140,7 +175,73 @@ const liststudentId = async (req, res, next) => {
     if (error && Object.keys(error).length > 0) {
       return res.json({
         statusCode: 400,
-        message: error.message,
+        message: error,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+const forgetPasswordValidity = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      EmailId: joi.string().email().min(15).max(56).required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+const changePasswordValidity = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      password: joi.string().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.body, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error,
       });
     } else {
       next();
@@ -161,7 +262,7 @@ const staffCreate = async (req, res, next) => {
     let profileValidate = joi.object({
       Name: joi.string().required(),
       EmailId: joi.string().email().min(9).required(),
-      password: joi.string().min(10).required(),
+      password: joi.string().min(7).required(),
       Role: joi.string().required(),
       Designation: joi.string().required(),
     });
@@ -193,7 +294,7 @@ const staffCreate = async (req, res, next) => {
   }
 };
 
-const updateStaff = async (req, res) => {
+const updateStaff = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       Name: joi.string(),
@@ -201,37 +302,6 @@ const updateStaff = async (req, res) => {
       password: joi.string().min(6).min(10),
       Role: joi.string(),
       Designation: joi.string(),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.body, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
-        statusCode: 400,
-        message: error.message,
-      });
-    }
-  } catch (error) {
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-    };
-  }
-};
-const listId = async (req, res, next) => {
-  try {
-    let profileValidate = joi.object({
-      page: joi.number(),
-      limit: joi.number(),
     });
 
     let options = {
@@ -260,12 +330,46 @@ const listId = async (req, res, next) => {
     };
   }
 };
+const listId = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      page: joi.number().required(),
+      limit: joi.number().required(),
+      staffId: joi.number(),
+    });
 
-const loginStaff = async (req, res) => {
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.query, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
+
+const loginStaff = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
       EmailId: await joi.string().email().min(12).required(),
-      password: await joi.string().required().min(6).max(10),
+      password: await joi.string().required().min(7),
     });
 
     let options = {
@@ -283,6 +387,8 @@ const loginStaff = async (req, res) => {
         statusCode: 400,
         message: error.message,
       });
+    } else {
+      next();
     }
   } catch (error) {
     return {
@@ -320,7 +426,7 @@ const createFee = async (req, res, next) => {
     if (error && Object.keys(error).length > 0) {
       return res.json({
         statusCode: 400,
-        message: error.message,
+        message: error,
       });
     } else {
       next();
@@ -376,8 +482,9 @@ const updateFee = async (req, res, next) => {
 const listById = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      page: joi.number(),
-      limit: joi.number(),
+      page: joi.string().required(),
+      limit: joi.string().required(),
+      feestrutureId: joi.number(),
     });
 
     let options = {
@@ -388,7 +495,7 @@ const listById = async (req, res, next) => {
         stripUnknown: true,
       },
     };
-    let { error, value } = profileValidate.validate(req.body, options);
+    let { error, value } = profileValidate.validate(req.query, options);
 
     if (error && Object.keys(error).length > 0) {
       return res.json({
@@ -405,21 +512,55 @@ const listById = async (req, res, next) => {
       message: error.message,
     };
   }
-}
+};
 
+const getByIdFee = async (req, res, next) => {
+  try {
+    let profileValidate = joi.object({
+      feestrutureId: joi.number().required(),
+    });
+
+    let options = {
+      basic: {
+        abortEarly: false,
+        convert: true,
+        allowUnknown: false,
+        stripUnknown: true,
+      },
+    };
+    let { error, value } = profileValidate.validate(req.query, options);
+
+    if (error && Object.keys(error).length > 0) {
+      return res.json({
+        statusCode: 400,
+        message: error.message,
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+    };
+  }
+};
 // studentFeeStructure
 
 const updateFeestructureValidation = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-     
       Designation: joi.string(),
-      year: params.joi.string(),
-      TuitionFee: joi.number(),
-      BookFee: joi.number(),
-      BusFee: joi.number(),
-      FirstGraduate_discount: joi.string(),
-      Reserved_students_Discount :joi.string()
+      year: joi.string(),
+      feestrutureId: joi.number(),
+      paidStatus: joi.string(),
+      TotalAmount: joi.number(),
+     fineAmount: joi.object().keys({
+      type:joi.string(),
+      Amount:joi.string(),
+      paidStatus:joi.string()
+     }),
     });
 
     let options = {
@@ -447,14 +588,14 @@ const updateFeestructureValidation = async (req, res, next) => {
       message: error.message,
     };
   }
-}
-
+};
 
 const listByIdFee = async (req, res, next) => {
   try {
     let profileValidate = joi.object({
-      page: joi.number(),
-      limit: joi.number(),
+      page: joi.number().required(),
+      limit: joi.number().required(),
+      studentFeestrutureId : joi.number()
     });
 
     let options = {
@@ -465,7 +606,7 @@ const listByIdFee = async (req, res, next) => {
         stripUnknown: true,
       },
     };
-    let { error, value } = profileValidate.validate(req.body, options);
+    let { error, value } = profileValidate.validate(req.query, options);
 
     if (error && Object.keys(error).length > 0) {
       return res.json({
@@ -482,8 +623,7 @@ const listByIdFee = async (req, res, next) => {
       message: error.message,
     };
   }
-}
-
+};
 
 module.exports = {
   studentLogin,
@@ -499,4 +639,8 @@ module.exports = {
   createFee,
   updateFee,
   listById,
+  validatePassword,
+  getByIdFee,
+  forgetPasswordValidity,
+  changePasswordValidity,
 };

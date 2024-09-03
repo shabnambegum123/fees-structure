@@ -1,8 +1,8 @@
+const bcrypt = require("bcrypt");
 
-const bcrypt = require('bcrypt')
-
-const generatePassword = async(password)=> {
-    const Password = await  bcrypt.hashSync(password,10)
-    return Password
-}
-module.exports = {generatePassword}
+const generatePassword = async (params) => {
+console.log(params)
+  const Password = await bcrypt.hash(params, 10);
+  return Password;
+};
+module.exports = { generatePassword };

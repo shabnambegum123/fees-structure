@@ -1,5 +1,5 @@
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-
+const {pagaMetaService} = require("../helpers/pagination")
 //not createsd studentFeestruture created in students profile service
 const createstudentFeeStructure = async (params) => {
   try {
@@ -40,10 +40,11 @@ const createstudentFeeStructure = async (params) => {
 //To update student feestructure
 const updatestudentFeeStructure = async (params) => {
   try {
+    console.log("hii")
     if (params.password) {
       params.password = await generatePassword(params.password);
     }
-
+   
     var result = await studentFeestruture.update(params, {
       where: { studentFeestrutureId: params.studentFeestrutureId },
       returning: true,
@@ -57,15 +58,17 @@ const updatestudentFeeStructure = async (params) => {
       };
     } else {
       return {
-        status: 400,
+        statusCode: 400,
+        status: false,
         message: "not found",
         data: {},
       };
     }
   } catch (error) {
     return {
-      status: 400,
-      message: "error",
+      statusCode: 400,
+      status: false,
+      message: error.message,
       data: {},
     };
   }
@@ -73,29 +76,43 @@ const updatestudentFeeStructure = async (params) => {
 // get by Id
 const getByIdstudentFeeStructure = async (params) => {
   try {
-    let studentId = params.studentId;
-    let result = studentFeestruture.findOne({
-      where: { studentId: studentId },
-      raw: true,
+    let studentFeestrutureId = params.studentFeestrutureId;
+    let result = await studentFeestruture.findOne({
+      attributes: [
+        "studentFeestrutureId",
+        "studentId",
+        "year",
+        "Designation",
+        "feestructureId",
+        "paidStatus",
+        "fineAmount",
+        "TotalAmount",
+      ],
+      where: {
+        studentFeestrutureId: studentFeestrutureId,
+      },
     });
-    if (!result.length > 0) {
+
+    if (result) {
       return {
-        statusCode: 400,
+        statusCode: 200,
         status: true,
-        message: "not found",
-        data: {},
+        message: "sended",
+        data: result,
       };
     } else {
       return {
-        status: 200,
-        message: "sent successfully",
-        data: result,
+        statusCode: 404,
+        status: false,
+        message: "data not found",
+        data: {},
       };
     }
   } catch (error) {
     return {
-      status: 400,
-      message: "error",
+      statusCode: 400,
+      status: false,
+      message: error.message,
       data: {},
     };
   }
@@ -104,15 +121,15 @@ const getByIdstudentFeeStructure = async (params) => {
 const deletestudentFeeStructure = async (params) => {
   try {
     let studentFeestrutureId = params.studentFeestrutureId;
-    let result = studentFeestruture.destroy(
-      { studentFeestrutureId: params.studentFeestrutureId },
-      { where: { is_deleted: true } }
+    let result =await studentFeestruture.update(
+      { is_deleted: "true" },
+      { where: {studentFeestrutureId: studentFeestrutureId  } }
     );
     if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "success",
+        message: "deleted",
         data: result,
       };
     } else {
@@ -133,15 +150,14 @@ const deletestudentFeeStructure = async (params) => {
 // list fees structure and pagetion
 const liststudentFeestructure = async (params) => {
   try {
-    let whereQuery = {};
+    var whereQuery = {};
+    let studentFeestrutureId = params.studentFeestrutureId;
 
-    if (params.profileId) {
-      whereQuery.profileId = params.profileId;
+    if (params.studentFeestrutureId) {
+      whereQuery.studentFeestrutureId = studentFeestrutureId;
     }
-    
-
-    let result = await studentProfile.findAll({
-       where: whereQuery,
+    let result = await studentFeestruture.findAll({
+      where: whereQuery,
       limit: +params.limit,
       offset: (params?.page - 1) * params?.limit,
     });

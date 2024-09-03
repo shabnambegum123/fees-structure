@@ -7,11 +7,17 @@ const {
   deletestudent,
   tokenGenerate,
   verifyToken,
-  joinstudentIdService,
+  restPasswordService,
+  forgetPasswordService,
+  changePasswordService,
+  bulkCreateService,
+  PDFformatService
 } = require("../service/studentProfileservice");
 
 const createUser = async (req, res) => {
-  let result = await createstudent(req.body);
+  let params = req.body;
+  params.DOB = req.query;
+  let result = await createstudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -66,9 +72,9 @@ const listUser = async (req, res) => {
 };
 
 const getById = async (req, res) => {
-  let params = req.body;
-  params.profileId = req.user.profileId;
-  console.log(params.profileId)
+    let params = req.body;
+    params.profileId = req.user.profileId;
+  console.log(params.profileId);
   const result = await getByIdstudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -88,7 +94,7 @@ const getById = async (req, res) => {
 const deleteUser = async (req, res) => {
   let params = req.body;
   params.profileId = req.user.profileId;
-  
+
   const result = await deletestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -126,12 +132,12 @@ const loginUser = async (req, res) => {
   }
 };
 const verifyUser = async (req, res) => {
- // let params = req.headers;
+  // let params = req.headers;
   let params = req.body;
- params.studentFeestrutureId  = req.user.studentFeestrutureId ;
- params.EmailId = req.user.EmailId
-   let result = await verifyToken(params);
- if (result.status) {
+  params.studentFeestrutureId = req.user.studentFeestrutureId;
+  params.EmailId = req.user.EmailId;
+  let result = await verifyToken(params);
+  if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
@@ -146,10 +152,10 @@ const verifyUser = async (req, res) => {
   }
 };
 
-const joinstudentId = async (req, res) => {
-  let params = req.query;
-
-  let result = await joinstudentIdService(params);
+const restPassword = async (req, res) => {
+  let params = req.body;
+  params.profileId = req.user.profileId;
+  let result = await restPasswordService(params);
 
   if (result.status) {
     res.status(result.statusCode).json({
@@ -165,6 +171,123 @@ const joinstudentId = async (req, res) => {
     });
   }
 };
+
+const forgetPassword = async (req, res) => {
+  try {
+    let params = req.body;
+
+    let result = await forgetPasswordService(params);
+    console.log("result", result);
+    if (result.status) {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    } else {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: "error",
+      data: {},
+    };
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    let params = {};
+    params.password = req.body;
+    params.token = req.headers.authorization;
+    let result = await changePasswordService(params);
+
+    if (result.status) {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    } else {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: "error",
+      data: {},
+    };
+  }
+};
+
+const bulkCreate = async (req,res) =>{
+  try {
+    console.log("hello",234567890)
+    let params = req.file
+    console.log("params" , params)
+    let result = await bulkCreateService(params);
+
+    if (result.status) {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    } else {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+      data: {},
+    };
+  }
+}
+
+const PDFformat = async (req,res) =>{
+  try {
+  let params = req.user
+    let result = await PDFformatService(params);
+
+    if (result.status) {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    } else {
+      res.status(result.statusCode).json({
+        status: result.statusCode,
+        message: result.message,
+        data: result.data,
+      });
+    }
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+      data: {},
+    };
+  }
+}
+
 module.exports = {
   createUser,
   updateUser,
@@ -173,5 +296,9 @@ module.exports = {
   deleteUser,
   loginUser,
   verifyUser,
-  joinstudentId,
+  forgetPassword,
+  restPassword,
+  changePassword,
+  bulkCreate,
+  PDFformat
 };

@@ -1,7 +1,7 @@
 const { default: axios, all } = require("axios");
 
 const axiosFunction = async function (data, url, Email) {
-  
+    
   let sendData = await axios.post(url, {
     find: data,
     EmailId: Email,
@@ -12,4 +12,4 @@ const axiosFunction = async function (data, url, Email) {
   }
 };
 
-module.exports = { axiosFunction}
+module.exports = { axiosFunction };

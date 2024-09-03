@@ -1,6 +1,6 @@
 const { DataTypes, BOOLEAN } = require("sequelize");
 const sequelize = require("../database");
-
+const {} = require("../database");
 const studentProfile = sequelize.define(
   "studentProfile",
   {
@@ -24,7 +24,7 @@ const studentProfile = sequelize.define(
       allowNull: false,
     },
     Role: {
-      type: DataTypes.ENUM("Student"),
+      type: DataTypes.ENUM("student"),
       allowNull: false,
     },
     Designation: {
@@ -56,14 +56,14 @@ const studentProfile = sequelize.define(
       allowNull: false,
       unique: true,
     },
-    is_deleted :{
-      type :DataTypes.BOOLEAN,
-     defaultValue : false
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
-    is_suspended:{
-      type :DataTypes.BOOLEAN,
-     defaultValue : false
-    }
+    is_suspended: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: true,

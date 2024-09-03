@@ -2,8 +2,9 @@ const { date } = require("joi");
 const feestructure = require("../Database/modal/feestructure");
 const studentProfile = require("../Database/modal/studentprofile");
 const { default: axios, all } = require("axios");
-const {axiosFunction } = require("../axios");
+const { axiosFunction } = require("../axios");
 const { Op } = require("sequelize");
+const { pagaMetaService } = require("../helpers/pagination");
 // create fee structure
 
 const createfeestructureService = async (params) => {
@@ -46,12 +47,14 @@ const createfeestructureService = async (params) => {
 // update feestucture
 const updatefeestructureService = async (params) => {
   try {
+    let studentFeestrutureId = params.studentFeestrutureId;
+   console.log(studentFeestrutureId)
     if (params.password) {
       params.password = await generatePassword(params.password);
     }
 
     var result = await feestructure.update(params, {
-      where: { feestructureId: params.feestructureId },
+      where: { studentFeestrutureId: studentFeestrutureId },
       returning: true,
     });
 
@@ -64,15 +67,17 @@ const updatefeestructureService = async (params) => {
       };
     } else {
       return {
-        status: 400,
+        statusCode: 400,
+        status: false,
         message: "not found",
         data: {},
       };
     }
   } catch (error) {
     return {
-      status: 400,
-      message: "error",
+      statusCode: 400,
+      status: false,
+      message: error.message,
       data: {},
     };
   }
@@ -80,15 +85,15 @@ const updatefeestructureService = async (params) => {
 // list Profile and pagenation
 const listfeestructureService = async (params) => {
   try {
-    let whereQuery = {};
+   
+    var whereQuery = {};
+    let feestrutureId = params.feestrutureId;
 
-    if (params.profileId) {
-      whereQuery.profileId = params.profileId;
+    if (params.feestrutureId) {
+      whereQuery.feestrutureId = feestrutureId;
     }
-    
-
-    let result = await studentProfile.findAll({
-       where: whereQuery,
+    let result = await feestructure.findAll({
+      where: whereQuery,
       limit: +params.limit,
       offset: (params?.page - 1) * params?.limit,
     });
@@ -128,27 +133,41 @@ const listfeestructureService = async (params) => {
 const getByIdfeestructureService = async (params) => {
   try {
     let feestrutureId = params.feestrutureId;
-    let result = feestructure.findOne({
-      where: { feestrutureId: feestrutureId },
-    });
+    let result = await feestructure.findOne({
+      attributes: [
+        "feestrutureId",
+        "Designation",
+        "year",
+        "TuitionFee",
+        "BusFee",
+        "FirstGraduate_discount",
+        "Reserved_students_Discount",
+        "TotalAmount",
+      ],
+      where: {
+        feestrutureId: feestrutureId,
+      },
+    })
+
     if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "fees amount",
+        message: "sended",
         data: result,
       };
     } else {
       return {
-        status: 400,
-        message: "not found",
+        statusCode: 404,
+        status: false,
+        message: "data not found",
         data: {},
       };
     }
   } catch (error) {
     return {
       status: 400,
-      message: "error",
+      message: error.message,
       data: {},
     };
   }
@@ -157,29 +176,31 @@ const getByIdfeestructureService = async (params) => {
 // soft delete
 const deletefeestructureService = async (params) => {
   try {
-    let feestructureId = params.feestructureId;
+    let feestrutureId = params.feestrutureId;
     let result = feestructure.update(
-      { feestructureId: params.feestructureId },
-      { where: { is_deleted: true } }
+      { is_deleted: true },
+      { where: { feestrutureId: feestrutureId } }
     );
     if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "created",
+        message: "deleted",
         data: result,
       };
     } else {
       return {
-        status: 400,
+        statusCode: 400,
+        status: false,
         message: "error",
         data: {},
       };
     }
   } catch (error) {
     return {
-      status: 400,
-      message: "error",
+      statusCode: 400,
+      status: false,
+      message: error.message,
       data: {},
     };
   }
@@ -187,44 +208,39 @@ const deletefeestructureService = async (params) => {
 // mangement should recieve the student details which where created on that day
 const sendMailManagement = async (params) => {
   try {
-    //let Date = params.Date;
+    let fromDate = params.fromDate;
+    let toDate = params.toDate;
     const find = await studentProfile.findAll({
       where: {
         createdAt: {
-          [Op.gt]: new Date("2024-08-18"),
-          [Op.lt]: new Date("2024-08-19"),
+          [Op.gt]: new Date(fromDate), //"2024-08-18"
+          [Op.lt]: new Date(toDate), //"2024-08-19"
         },
       },
       raw: true,
     });
-    console.log(find, "find");
+
     if (find) {
+      for (let item of find) {
+        let url = process.env.managementUrl;
+        const axios = await axiosFunction(item, url);
 
-  for (let item of find) {
-    let url = process.env.managementUrl;
-    const axios = await axiosFunction(item,url);
-  }
-
-      if (axios) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "login successful",
-          data: {},
-        };
-      } else {
-        return {
-          statusCode: 400,
-          status: true,
-          message: "user not found",
-          data: {},
-        };
+        if (axios) {
+          return {
+            statusCode: 200,
+            status: true,
+            message: "login successful",
+            data: {},
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "user not found",
+            data: {},
+          };
+        }
       }
-      // let url = "http://localhost:4000/management/send";
-      // let sendData = await axios.post(url, {
-      //   find: "hello",
-      // });
-      // console.log(sendData);
     } else {
       return {
         status: 400,
@@ -236,7 +252,7 @@ const sendMailManagement = async (params) => {
     return {
       statusCode: 400,
       status: false,
-      message: "error",
+      message: error.message,
       data: {},
     };
   }

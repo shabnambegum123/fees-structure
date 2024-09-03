@@ -1,17 +1,17 @@
-const sequelize = require("sequelize");
-
+const sequelize = require("sequelize")
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn("studentProfile", "profileImage", {
-      type: sequelize.DataTypes.BIGINT,
-      allowNull: false,
-    });
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn(
+      'studentProfile', 
+      'profileImage', 
+      {
+        type: sequelize.BIGINT,
+        allowNull: true
+      }
+    )
   },
-
-  // async down (queryInterface, Sequelize) {
-
-  //     await queryInterface.removeColumn('users',);
-
-  // }
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('studentProfile', 'age');
+  }
 }
 

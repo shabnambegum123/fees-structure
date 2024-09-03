@@ -3,13 +3,14 @@ const studentFeestruture = require("../Database/modal/studentFeestruture");
 const studentProfile = require("../Database/modal/studentprofile");
 const joi = require("joi");
 const staffprofile = require("../Database/modal/staffprofile");
-const { verifyRoleFee } = require("../Router/router");
+
 
 const verifyToken = async (req, res, next) => {
   try {
+    console.log('hii')
     var token = req.headers.authorization;
 
-    var Token = await jwt.verify(token, process.env.secretKey);
+    var Token = jwt.verify(token, process.env.secretKey);
 
     if (Token.profileId) {
       const allow = await studentProfile.findOne({
@@ -27,7 +28,8 @@ const verifyToken = async (req, res, next) => {
       }
     } else {
       const allow = await staffprofile.findOne({
-        where: { staffId: Token[0].staffId, is_deleted: false },
+        where: { staffId: Token.staffId, is_deleted: false },
+        raw: true,
       });
 
       if (allow) {
@@ -53,10 +55,33 @@ const verifyToken = async (req, res, next) => {
 
 // authorization
 
-const verifyRole = async (req,res) => {
+const verifyRole = (role = []) =>
+  async function (req, res, next) {
+    try {
+      
+      var token = req.headers.authorization;
 
-  
-}
+      var Token = jwt.verify(token, process.env.secretKey);
+      
+      if (Token.Role == role ) {
+         
+        next()
 
+      }
+       else  {
+        res.status(400).json({
+          status: 400,
+          message: "error",
+          data: {},
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message,
+        data: {},
+      });
+    }
+  };
 
 module.exports = { verifyToken, verifyRole };
