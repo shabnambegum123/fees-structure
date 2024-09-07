@@ -103,7 +103,9 @@ const deleteFeestructure = async (req, res) => {
 };
 
 const managementMail = async (req, res) => {
+
   const datas = req.body;
+
   const result = await sendMailManagement(datas);
   if (result.status) {
     res.status(result.statusCode).json({

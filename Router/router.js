@@ -34,7 +34,8 @@ const {
   forgetPassword,
   changePassword,
   bulkCreate,
-  PDFformat
+  PDFformat,
+  getUsingJoin
 } = require("../Controller/studentProfile");
 
 const {
@@ -63,6 +64,7 @@ const {
   loginstaff,
   verifystaffToken,
   mailsend,
+  updatePaidFees
 } = require("../Controller/staffprofile");
 
 // student profile
@@ -93,6 +95,7 @@ router.put("/reset/password", [verifyToken,verifyRole("Student")], [validatePass
 router.post("/forget/password",[forgetPasswordValidity], forgetPassword);//done
 router.put("/change/password", [verifyToken,verifyRole("Student")],[changePasswordValidity], changePassword)// done
 router.get("/PDF/email", [verifyToken,verifyRole("Student")],PDFformat)
+router.get ("/join/get",getUsingJoin)
 // fees structure
 router.post(
   "/create/feestructure",
@@ -100,8 +103,8 @@ router.post(
   [createFee],
   createFeestructure
 ); // done
-router.put("/update/feestructure", [verifyToken,verifyRole("Staff")], [updateFee],[updateFeeQuery], updateFeestructure); // done
-router.get("/list/feestructure", [verifyToken,verifyRole("Staff")], [listById], listFeestructure); // done
+router.put("/update/feestructure", [verifyToken,verifyRole("Staff"),updateFee,updateFeeQuery],  updateFeestructure); // done
+router.get("/list/feestructure", [verifyToken,verifyRole(["Staff","Student"])], [listById], listFeestructure); // done
 router.get("/byId/feestructure", [verifyToken,verifyRole("Staff")], [getByIdFee], getByIdFeestructure); //done
 router.delete("/delete/feestructure", [verifyToken],verifyRole("Staff"),[DeleteFeeQuery], deleteFeestructure);//done
 router.get("/send/management", [verifyToken,verifyRole("Staff")], managementMail);// error
@@ -124,7 +127,7 @@ router.get("/list/staff", [verifyToken,verifyRole("Staff")], [listId], liststaff
 router.delete("/delete/staff",[verifyToken,verifyRole("Staff")], deletestaff)// done
 router.post("/login/staff", [loginStaff], loginstaff);//done
 router.get("/verify/token", [verifyToken,verifyRole("Staff")], verifystaffToken)
-router.get("/payment/mail", [verifyToken,verifyRole("Staff")], mailsend)
-
+router.get("/payment/mail", [verifyToken,verifyRole("Staff")], mailsend)// done
+router.put("/update/Fine", [verifyToken,verifyRole("Staff")],updatePaidFees)// done
 module.exports = router
 

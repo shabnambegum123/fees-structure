@@ -302,6 +302,11 @@ const updateStaff = async (req, res, next) => {
       password: joi.string().min(6).min(10),
       Role: joi.string(),
       Designation: joi.string(),
+      fineAmount: joi.object().keys({
+        type:joi.string(),
+        Amount:joi.number(),
+        paidstatus:joi.string()
+       }),
     });
 
     let options = {
@@ -446,12 +451,16 @@ const updateFee = async (req, res, next) => {
       Designation: joi.string(),
       year: joi.string(),
       TuitionFee: joi.number(),
-      BookFee: joi.number(),
+       BookFee: joi.number(),
       BusFee: joi.number(),
       FirstGraduate_discount: joi.number(),
       Reserved_students_Discount: joi.number(),
-    });
+    })
 
+    let ProfileValidate = joi.object({
+      feestrutureId : joi.number().required()
+      
+    });
     let options = {
       basic: {
         abortEarly: false,
@@ -460,57 +469,88 @@ const updateFee = async (req, res, next) => {
         stripUnknown: true,
       },
     };
-    let { error, value } = profileValidate.validate(req.body, options);
+    let { error:bodyError, value } = profileValidate.validate(req.body, options);
 
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
+    if (bodyError) {
+      return ({
+        status:false,
         statusCode: 400,
-        message: error.message,
+        message: `Body validation error: ${bodyError.message}`,
       });
-    } else {
-      next();
+
+    } 
+    
+    let { error: queryError, value: queryValue } = ProfileValidate.validate(req.query, options);
+
+    if (queryError) {
+      return ({
+        status:false,
+        statusCode: 400,
+        message: `Query validation error: ${queryError.message}`,
+      });
     }
+   
+    next()
+
   } catch (error) {
     return {
       statusCode: 400,
       status: false,
       message: error.message,
-    };
+    }
   }
+}
+
+
+let profileValidate = joi.object({
+  page: joi.string().required(),
+  limit: joi.string().required(),
+  feestrutureId: joi.number(),
+})
+
+let Profile =  joi.object({
+  page: joi.string().required(),
+  limit: joi.string().required(),
+  feestrutureId: joi.number(),
+})
+let options = {
+  basic: {
+    abortEarly: false,
+    convert: true,
+    allowUnknown: false,
+    stripUnknown: true,
+  },
 };
-
 const listById = async (req, res, next) => {
-  try {
-    let profileValidate = joi.object({
-      page: joi.string().required(),
-      limit: joi.string().required(),
-      feestrutureId: joi.number(),
-    });
-
-    let options = {
-      basic: {
-        abortEarly: false,
-        convert: true,
-        allowUnknown: false,
-        stripUnknown: true,
-      },
-    };
-    let { error, value } = profileValidate.validate(req.query, options);
-
-    if (error && Object.keys(error).length > 0) {
-      return res.json({
+   try {
+   
+    const { error: bodyError, value: bodyValue } =profileValidate.validate(req.body, options);
+    
+    if (bodyError) {
+      return res.status(400).json({
         statusCode: 400,
-        message: error.message,
+        message: `Body validation error: ${bodyError.message}`,
       });
-    } else {
-      next();
     }
+
+   
+    const { error: queryError, value: queryValue } = profileSchema.validate(req.query, options);
+
+    if (queryError) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: `Query validation error: ${queryError.message}`,
+      });
+    }
+
+    
+    next();
   } catch (error) {
-    return {
+    return res.status(400).json({
       statusCode: 400,
       status: false,
       message: error.message,
-    };
+    });
   }
 };
 

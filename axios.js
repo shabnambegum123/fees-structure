@@ -1,7 +1,7 @@
 const { default: axios, all } = require("axios");
 
 const axiosFunction = async function (data, url, Email) {
-    
+  data = JSON.stringify(data);
   let sendData = await axios.post(url, {
     find: data,
     EmailId: Email,

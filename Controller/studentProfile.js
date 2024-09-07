@@ -11,7 +11,8 @@ const {
   forgetPasswordService,
   changePasswordService,
   bulkCreateService,
-  PDFformatService
+  PDFformatService,
+  getUsingJoinService
 } = require("../service/studentProfileservice");
 
 const createUser = async (req, res) => {
@@ -287,6 +288,36 @@ const PDFformat = async (req,res) =>{
     };
   }
 }
+ 
+const getUsingJoin = async (req,res) =>{
+  try {
+    let params = req.query
+      let result = await getUsingJoinService(params);
+  
+      if (result.status) {
+        res.status(result.statusCode).json({
+          status: result.statusCode,
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        res.status(result.statusCode).json({
+          status: result.statusCode,
+          message: result.message,
+          data: result.data,
+        });
+      }
+    } catch (error) {
+      return {
+        statusCode: 400,
+        status: false,
+        message: error.message,
+        data: {},
+      };
+    }
+}
+
+
 
 module.exports = {
   createUser,
@@ -300,5 +331,6 @@ module.exports = {
   restPassword,
   changePassword,
   bulkCreate,
-  PDFformat
+  PDFformat,
+  getUsingJoin
 };

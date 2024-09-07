@@ -208,6 +208,7 @@ const deletefeestructureService = async (params) => {
 // mangement should recieve the student details which where created on that day
 const sendMailManagement = async (params) => {
   try {
+
     let fromDate = params.fromDate;
     let toDate = params.toDate;
     const find = await studentProfile.findAll({
@@ -219,11 +220,14 @@ const sendMailManagement = async (params) => {
       },
       raw: true,
     });
+    console.log("find", find);
 
     if (find) {
       for (let item of find) {
         let url = process.env.managementUrl;
-        const axios = await axiosFunction(item, url);
+        console.log("testing" , url)
+        let EmailId = "shabnambegum227@gmail.com" 
+        const axios = await axiosFunction(item, url,EmailId);
 
         if (axios) {
           return {
@@ -249,6 +253,7 @@ const sendMailManagement = async (params) => {
       };
     }
   } catch (error) {
+    console.log("error" , error)
     return {
       statusCode: 400,
       status: false,

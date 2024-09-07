@@ -49,6 +49,8 @@ const feestructure = sequelize.define(
   {
     timestamps: true,
   }
-);
+)
+
+
 
 module.exports = feestructure;

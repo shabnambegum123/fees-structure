@@ -67,40 +67,30 @@ const updatestaffprofile = async (params) => {
     if (params.password) {
       params.password = await generatePassword(params.password);
     }
-    if (params.fineAmount) {
-      var paid = await studentProfile.destroy({
-        where: { fineAmount: params.fineAmount },
-      });
+    var result = await staffprofile.update(params, {
+      where: { staffId: params.staffId },
+      returning: true,
+    });
+    console.log(result);
+    if (result) {
       return {
         statusCode: 200,
         status: true,
-        message: "paid",
-        data: paid,
-      }
+        message: "updated",
+        data: result,
+      };
+    } else {
+      return {
+        status: 400,
+        message: "not found",
+        data: {},
+      };
     }
-    // var result = await staffprofile.update(params, {
-    //   where: { staffId: params.staffId },
-    //   returning: true,
-    // });
-    // console.log(result)
-    // if (result) {
-    //   return {
-    //     statusCode: 200,
-    //     status: true,
-    //     message: "updated",
-    //     data: result,
-    //   };
-    // } else {
-    //   return {
-    //     status: 400,
-    //     message: "not found",
-    //     data: {},
-    //   };
-    // }
   } catch (error) {
     return {
-      status: 400,
-      message: "error",
+      statusCode: 400,
+      status: false,
+      message: error.message,
       data: {},
     };
   }
@@ -277,72 +267,27 @@ const loginstaffProfile = async (params) => {
 };
 
 // To add the fineAmount in studentfeestructure in json format ... if fineAmount already exists push the fineAmount in the array and also update the amount the in the totalAmount column
-const staffToken = async (param) => {
+const   staffToken = async (param) => {
   try {
     let studentId = param.studentId;
     let result = await studentFeestruture.findOne(
       { where: { studentId: studentId } },
       { raw: true }
-    );
-    console.log(result);
-    if (result.fineAmount === null) {
-      // let updatestudentFeeStructure = await studentFeestruture.update(
-      //   { fineAmount: param.fineAmount },
-      //   { where: { studentId: studentId } }
-      // );
+    )
+     if (result.fineAmount === null) {
+      let updatestudentFeeStructure = await studentFeestruture.update(
+        { fineAmount: param.fineAmount },
+        { where: { studentId: studentId } }
+      );
 
-      // if (updatestudentFeeStructure) {
-      var amount = await studentFeestruture.findOne({
-        where: { studentId: param.studentId },
-        raw: true,
-      });
-      console.log(amount);
-      let finalTotalAmount = await studentFeestruture.update(
-        { TotalAmount: amount.fineAmount.Amount + amount.TotalAmount },
-        { where: { studentId: param.studentId } }
-      );
-      if (finalTotalAmount) {
-        return {
-          statusCode: 200,
-          status: true,
-          message: "updated",
-          data: {},
-        };
-      } else {
-        return {
-          statusCode: 400,
-          status: true,
-          message: "error",
-          data: {},
-        };
-      }
-      // } else {
-      //   return {
-      //     statusCode: 400,
-      //     status: true,
-      //     message: "error",
-      //     data: {},
-      //   };
-      // }
-    } else if (result.fineAmount.length > 0) {
-      result.fineAmount.push(param.fineAmount);
-      var updatestudentFeeStructure = await studentFeestruture.update(
-        { fineAmount: result.fineAmount },
-        { where: { studentId: param.studentId } }
-      );
       if (updatestudentFeeStructure) {
         var amount = await studentFeestruture.findOne({
           where: { studentId: param.studentId },
           raw: true,
         });
-        let a = 0;
-        for (let item of amount.fineAmount) {
-          if (item) {
-            a += item.Amount;
-          }
-        }
+        console.log(amount);
         let finalTotalAmount = await studentFeestruture.update(
-          { TotalAmount: amount.TotalAmount + a },
+          { TotalAmount: amount.fineAmount.Amount + amount.TotalAmount },
           { where: { studentId: param.studentId } }
         );
         if (finalTotalAmount) {
@@ -368,6 +313,50 @@ const staffToken = async (param) => {
           data: {},
         };
       }
+    } else if (result.fineAmount.length > 0) {
+      result.fineAmount.push(param.fineAmount);
+      var updatestudentFeeStructure = await studentFeestruture.update(
+        { fineAmount: result.fineAmount },
+        { where: { studentId: param.studentId } }
+      )
+      if (updatestudentFeeStructure) {
+        var amount = await studentFeestruture.findOne({
+          where: { studentId: param.studentId },
+          raw: true,
+        });
+        let a = 0;
+        for (let item of amount.fineAmount) {
+          if (item) {
+            a += item.Amount;
+          }
+        }
+        let finalTotalAmount = await studentFeestruture.update(
+          { TotalAmount: amount.TotalAmount + a },
+          { where: { studentId: param.studentId } }
+        );
+        if (finalTotalAmount) {
+          return {
+            statusCode: 200,
+            status: true,
+            message: "updated",
+            data: {},
+          }
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "error",
+            data: {},
+          };
+        }
+      } else {
+        return {
+          statusCode: 400,
+          status: true,
+          message: "error",
+          data: {},
+        };
+      }
     }
   } catch (error) {
     return {
@@ -375,9 +364,9 @@ const staffToken = async (param) => {
       status: false,
       message: error.message,
       data: {},
-    };
+    }
   }
-};
+}
 
 // if fees is delay staff should send the mail to student  that  they have pending
 const paymentmail = async () => {
@@ -386,37 +375,44 @@ const paymentmail = async () => {
       where: { paidStatus: "pending" },
       raw: true,
     });
-
+    if (!result || result.length === 0) {
+      return {
+        statusCode: 404,
+        status: false,
+        message: "No pending fees found",
+        data: {},
+      };
+    }
     if (result) {
-      for (let item of result) {
+      for (let i = 0; i < result.length; i++) {
+        const item = result[i];
         var find = await studentProfile.findOne({
           where: { profileId: item.studentId },
           raw: true,
         });
 
         if (find) {
-          let mailObject = {
-            to: find.EmailId,
-            data: item.TotalAmount,
-          };
-          let url = process.env.pendingUrl;
-          const axios = await axiosFunction(mailObject, url);
+          let EmailId = find.EmailId;
+          let TotalAmount = item.TotalAmount;
 
-          if (axios) {
-            return {
-              statusCode: 200,
-              status: true,
-              message: "sended",
-              data: {},
-            };
-          } else {
-            return {
-              statusCode: 400,
-              status: true,
-              message: "error",
-              data: {},
-            };
-          }
+          let url = process.env.pendingUrl;
+          const axios = await axiosFunction(TotalAmount, url, EmailId);
+
+          // if (axios) {
+          //   return {
+          //     statusCode: 200,
+          //     status: true,
+          //     message: "sended",
+          //     data: {},
+          //   };
+          // } else {
+          //   return {
+          //     statusCode: 400,
+          //     status: true,
+          //     message: "error",
+          //     data: {},
+          //   };
+          // }
         } else {
           return {
             statusCode: 400,
@@ -444,6 +440,71 @@ const paymentmail = async () => {
   }
 };
 
+const updatePaidFeeservice = async (params) => {
+  try {
+    if (params.fineAmount) {
+      var checkStudentFees = await studentFeestruture.findOne({
+        where: { studentFeestrutureId: params.studentFeestrutureId },
+        raw: true,
+      });
+      console.log("checkStudentFees" , checkStudentFees);
+      if (!checkStudentFees) {
+        return {
+          statusCode: 404,
+          status: false,
+          message: "Profile not found",
+          data: {},
+        }
+      }
+      
+      if (checkStudentFees.fineAmount && checkStudentFees.fineAmount.length > 0) {
+        let value = params?.fineAmount?.Amount;
+        var exactValue = checkStudentFees?.TotalAmount - value;
+        let filteredFineAmount = checkStudentFees.fineAmount.map((x) => {
+          if (x.type == params.fineAmount.type) {
+            x.paidstatus = "PAID",
+            x.paymentDoneBy = params.staffId
+          }
+          return x
+        })
+        var update = await studentFeestruture.update(
+          { fineAmount: filteredFineAmount, TotalAmount: exactValue },
+          { where: { studentFeestrutureId: params.studentFeestrutureId } }
+        );
+        if (update) {
+          return {
+            statusCode: 200,
+            status: true,
+            message: "updated",
+            data: update,
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: false,
+            message: "not found",
+            data: {},
+          };
+        }
+      }
+      return {
+        statusCode: 400,
+        status: true,
+        message: "Fine Amount not found",
+        data: {},
+      };
+    }
+
+     } catch (error) {
+    return {
+      statusCode: 400,
+      status: true,
+      message: error.message,
+      data: {},
+    };
+  }
+};
+
 module.exports = {
   createstaffprofile,
   updatestaffprofile,
@@ -453,4 +514,5 @@ module.exports = {
   loginstaffProfile,
   staffToken,
   paymentmail,
+  updatePaidFeeservice,
 };

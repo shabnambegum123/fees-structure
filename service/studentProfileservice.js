@@ -236,7 +236,7 @@ const createstudent = async (params) => {
         } else {
           return {
             statusCode: 400,
-            status: true,
+            status: false,
             message: "not created",
             data: {},
           };
@@ -245,7 +245,7 @@ const createstudent = async (params) => {
     } else {
       return {
         statusCode: 400,
-        status: true,
+        status: false,
         message: "you are not eligible",
       };
     }
@@ -295,79 +295,74 @@ const updatestudent = async (params) => {
 // list student profile and pagenation
 const liststudent = async (params) => {
   try {
-    let whereQuery = {};
-    if (params.is_deleted) {
-      whereQuery = {
-        is_deleted: Boolean(params.is_deleted),
-      };
-    }
-    if (params.search) {
-      whereQuery[Op.or] = [
-        {
-          Name: {
-            [Op.like]: params.search,
-          },
-        },
-        {
-          EmailId: {
-            [Op.like]: params.search,
-          },
-        },
-        {
-          profileId: {
-            [Op.like]: params.search,
-          },
-        },
-      ];
-    }
-    if (params.key && params.order) {
-      var order = { order: [[params.key, params.order]] };
-    } else {
-      var order = { order: [["createdAt", "DESC"]] };
-    }
-    if (params.staffId) {
-      whereQuery.staffId = params.staffId;
-    }
-
-    let result;
-    if (params.page && params.limit) {
-      result = await studentProfile.findAll({
-        where: whereQuery,
-        limit: +params.limit,
-        offset: (params?.page - 1) * params?.limit,
-        order: order.order,
-      });
-      data = await pagaMetaService(
-        +params.page,
-        +params.limit,
-        result,
-        result.length
-      );
-    } else {
-      result = await studentProfile.findAll({
-        where: whereQuery,
-      });
-      data = result;
-    }
-    if (result.length > 0) {
-      return {
-        statusCode: 200,
-        status: true,
-        message: "sended",
-        data: data
-      };
-    } else {
-      return {
-        statusCode: 400,
-        status: false,
-        message: "data not found",
-        data: {},
-      };
-    }
-
-    
-
-   
+    // let whereQuery = {};
+    // if (params.is_deleted) {
+    //   whereQuery = {
+    //     is_deleted: Boolean(params.is_deleted),
+    //   };
+    // }
+    // if (params.search) {
+    //   whereQuery[Op.or] = [
+    //     {
+    //       Name: {
+    //         [Op.like]: startsWith(params.search),
+    //       },
+    //     },
+    //     {
+    //       EmailId: {
+    //         [Op.like]: params.search,
+    //       },
+    //     },
+    //     {
+    //       profileId: {
+    //         [Op.like]: params.search,
+    //       },
+    //     },
+    //   ];
+    // }
+    // if (params.key && params.order) {
+    //   var order = { order: [[params.key, params.order]] };
+    // } else {
+    //   var order = { order: [["createdAt", "DESC"]] };
+    // }
+    // if (params.staffId) {
+    //   whereQuery.staffId = params.staffId;
+    // }
+    // let result;
+    // if (params.page && params.limit) {
+    //   result = await studentProfile.findAll({
+    //     where: whereQuery,
+    //     limit: +params.limit,
+    //     offset: (params?.page - 1) * params?.limit,
+    //     order: order.order,
+    //   });
+    //   data = await pagaMetaService(
+    //     +params.page,
+    //     +params.limit,
+    //     result,
+    //     result.length
+    //   );
+    // } else {
+    //   result = await studentProfile.findAll({
+    //     where: whereQuery,
+    //   });
+    //   data = result;
+    // }
+    // if (result.length > 0) {
+    //   return {
+    //     statusCode: 200,
+    //     status: true,
+    //     message: "sended",
+    //     data: data
+    //   };
+    // } else {
+    //   return {
+    //     statusCode: 400,
+    //     status: false,
+    //     message: "data not found",
+    //     data: {},
+    //   };
+    // }
     // }
     // console.log(params.Name);
     // let search = await studentProfile.findAll({
@@ -380,7 +375,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data: search,
     // }
-
     // op.eq checks the number is equal
     // let result = await studentProfile.findAll({where:{profileId:{[Op.eq]:params.profileId}}})
     // return {
@@ -390,7 +384,6 @@ const liststudent = async (params) => {
     //   data:result,
     // };
     // op.is defines the null value
-
     // let result = await studentProfile.findAll({where:{feestructureId:{[Op.is]:null}}})
     // return {
     //   statusCode: 200,
@@ -398,9 +391,7 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // op.gt gives the profileId is greater than the given value
-
     // let result = await studentProfile.findAll({where:{profileId:{[Op.gt]:5}}})
     // return {
     //   statusCode: 200,
@@ -408,7 +399,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // op.gte
     // let result = await studentProfile.findAll({where:{profileId:{[Op.gt]:5}}})
     // return {
@@ -417,7 +407,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // Op.between
     // let result = await studentProfile.findAll({where:{profileId:{[Op.between]:[5,6]}}})
     // return {
@@ -426,7 +415,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // op.notIn except that value
     // let result = await studentProfile.findAll({where:{profileId:{[Op.notIn]:[5,6]}}})
     // return {
@@ -435,7 +423,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // op.in checks the value exists in list or not
     // let result = await studentProfile.findAll({where:{profileId:{[Op.in]:[5,6]}}})
     // return {
@@ -444,7 +431,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // op.like exact name should must be given
     // let result = await studentProfile.findAll({where:{Name:{[Op.like]:params.Name}}})
     // return {
@@ -453,10 +439,8 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data:result,
     // };
-
     // //op.iLike
     // let result = await studentProfile.findAll({where:{Name:{[Op.contains
-
     // ]:params.Name}}})
     // return {
     //   statusCode: 200,
@@ -848,10 +832,190 @@ const bulkCreateService = async (params) => {
         mobileNumber,
       });
     }
+
     if (data.length > 0) {
       for (let i = 1; i < data.length; i++) {
         data[i].password = await generatePassword(data[i].password);
-        let result = await studentProfile.create(data[i]);
+        var checkFeeStructure = await feestructure.findOne({
+          where: {
+            feestrutureId: data[i].feestrutureId,
+          },
+          raw: true,
+        });
+        let checkEmailExists = await studentProfile.findOne({
+          where: { EmailId: data[i].EmailId },
+        });
+
+        let checkMobileNumberExists = await studentProfile.findOne({
+          where: { mobileNumber: data[i].mobileNumber },
+        });
+
+        if (checkEmailExists) {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "EmailId already exists",
+            data: {},
+          };
+        }
+        if (checkMobileNumberExists) {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "mobileNumber already exists",
+            data: {},
+          };
+        }
+        var result = await studentProfile.create(data[i]);
+        let createStudentFeeData = {
+          feestructureId: data[i].feestructureId,
+          Designation: data[i].Designation,
+          year: data[i].currentYear,
+          TuitionFee: checkFeeStructure.TuitionFee,
+          BusFee: checkFeeStructure.BusFee,
+          BookFee: checkFeeStructure.BookFee,
+          FirstGraduate_discount: checkFeeStructure.FirstGraduate_discount,
+          Reserved_students_Discount:
+            checkFeeStructure.Reserved_students_Discount,
+          paidStatus: data[i].paidStatus || "pending",
+          TotalAmount:
+            checkFeeStructure.TuitionFee +
+            checkFeeStructure.BusFee +
+            checkFeeStructure.BookFee,
+          studentId: result[i].profileId,
+        };
+
+        if (
+          ["BC"].includes(data[i]?.category) &&
+          !["true"].includes(data[i]?.is_FirstGraduate)
+        ) {
+          createStudentFeeData.TotalAmount =
+            (checkFeeStructure.TotalAmount *
+              checkFeeStructure.Reserved_students_Discount) /
+            100;
+
+          let percentage =
+            checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
+          createStudentFeeData.TotalAmount = percentage;
+
+          let createstudentfeestructure = await studentFeestruture.create(
+            createStudentFeeData
+          );
+          let updatestudentprofile = await studentProfile.update(
+            {
+              studentFeestrutureId:
+                createstudentfeestructure.studentFeestrutureId,
+            },
+            { where: { profileId: result[i].profileId } }
+          );
+
+          if (updatestudentprofile) {
+            return {
+              statusCode: 200,
+              status: true,
+              message: "create",
+              data: {},
+            };
+          }
+        } else if (
+          ["true"].includes(data[i]?.is_FirstGraduate) &&
+          !["BC"].includes(data[i]?.category)
+        ) {
+          createStudentFeeData.TotalAmount =
+            (checkFeeStructure.TotalAmount *
+              checkFeeStructure.FirstGraduate_discount) /
+            100;
+
+          let percentage =
+            checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
+          createStudentFeeData.TotalAmount = percentage
+
+          let createstudentfeestructure = await studentFeestruture.create(
+            createStudentFeeData
+          )
+          let updatestudentprofile = await studentProfile.update(
+            {
+              studentFeestrutureId:
+                createstudentfeestructure.studentFeestrutureId,
+            },
+            { where: { profileId: result[i].profileId } }
+          );
+
+          if (updatestudentprofile) {
+            return {
+              statusCode: 200,
+              status: true,
+              message: "create",
+              data: {},
+            };
+          }
+
+          if (result) {
+            return {
+              statusCode: 200,
+              status: true,
+              message: "create",
+              data: {},
+            };
+          } else {
+            return {
+              statusCode: 400,
+              status: true,
+              message: "not created",
+              data: {},
+            };
+          }
+        } else if (
+          ["true"].includes(data[i]?.is_FirstGraduate) &&
+          ["BC"].includes(data[i]?.category)
+        ) {
+          createStudentFeeData.TotalAmount =
+            (checkFeeStructure.TotalAmount *
+              checkFeeStructure.FirstGraduate_discount) /
+            100;
+          let percentage =
+            checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
+          let total =
+            (percentage * checkFeeStructure.Reserved_students_Discount) / 100;
+          let totalpercentage = total - createStudentFeeData.TotalAmount;
+          createStudentFeeData.TotalAmount = totalpercentage;
+
+          let createstudentfeestructure = await studentFeestruture.create(
+            createStudentFeeData
+          );
+          let updatestudentprofile = await studentProfile.update(
+            {
+              studentFeestrutureId:
+                createstudentfeestructure.studentFeestrutureId,
+            },
+            { where: { profileId: result[i].profileId } }
+          );
+
+          if (updatestudentprofile) {
+            return {
+              statusCode: 200,
+              status: true,
+              message: "create",
+              data: {},
+            };
+          }
+        }
+        if (result) {
+          return {
+            statusCode: 200,
+            status: true,
+            message: "create",
+            data: {},
+          };
+        } else {
+          return {
+            statusCode: 400,
+            status: true,
+            message: "not created",
+            data: {},
+          };
+        }
+        // let result = await studentProfile.create(data[i]);
       }
       return {
         statusCode: 200,
@@ -860,41 +1024,12 @@ const bulkCreateService = async (params) => {
         data: {},
       };
     }
-    // Send the data as JSON response
   } catch (error) {
     console.log("error", error);
     return {
       statusCode: 400,
       status: false,
       message: error.message,
-      data: {},
-    };
-  }
-
-  //console.log(str);
-  return console.log("hello");
-
-  let password = await generatePassword(params.password);
-  console.log("password", password);
-
-  let check = await generateToken(params.token);
-  console.log("check", check);
-  let result = await studentProfile.update(
-    { password: password },
-    { where: { profileId: check.profileId } }
-  );
-  if (result) {
-    return {
-      statusCode: 200,
-      status: true,
-      message: "updated",
-      data: {},
-    };
-  } else {
-    return {
-      statusCode: 400,
-      status: false,
-      message: "not updated",
       data: {},
     };
   }
@@ -938,6 +1073,51 @@ const PDFformatService = async (params) => {
   }
 };
 
+const getUsingJoinService = async (params) => {
+  try {
+    
+    // let result = await studentProfile.findOne({
+    //   where:{profileId:params.profileId},
+    //   include :[{
+    //     model: studentFeestruture,
+    //     as : "studentFeeDetails"
+    //   }]
+    // })
+
+     let result = await studentFeestruture.findOne({
+      where:{studentId:params.studentId},
+      include :[{
+        model: studentProfile,
+        as : "studentDetails"
+      }]
+    })
+
+    if (result) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "sended",
+        data:result,
+      };
+    } else {
+      return {
+        statusCode: 400,
+        status: true,
+        message: "error",
+        data: {},
+      };
+    }
+  } catch (error) {
+    console.log("Error", error);
+    return {
+      statusCode: 400,
+      status: false,
+      message: "error",
+      data: {},
+    };
+  }
+};
+
 module.exports = {
   createstudent,
   updatestudent,
@@ -951,4 +1131,5 @@ module.exports = {
   changePasswordService,
   bulkCreateService,
   PDFformatService,
+  getUsingJoinService,
 };

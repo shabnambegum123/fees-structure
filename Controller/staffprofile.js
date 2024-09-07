@@ -8,6 +8,7 @@ const {
   loginstaffProfile,
   staffToken,
   paymentmail,
+  updatePaidFeeservice
 } = require("../service/staffProfileservice");
 
 const createstaff = async (req, res) => {
@@ -31,7 +32,7 @@ const createstaff = async (req, res) => {
 const updatestaff = async (req, res) => {
   let params = req.body;
   params.staffId = req.user.staffId;
-
+   
   const result = await updatestaffprofile(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -162,6 +163,25 @@ const mailsend = async (req, res) => {
     });
   }
 };
+const updatePaidFees = async (req,res) =>{
+  let params = req.body;
+    params.staffId = req.user.staffId
+    params.studentFeestrutureId = req.query.studentFeestrutureId
+  const result = await updatePaidFeeservice(params);
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+}
 
 module.exports = {
   createstaff,
@@ -172,4 +192,5 @@ module.exports = {
   loginstaff,
   verifystaffToken,
   mailsend,
+  updatePaidFees
 };

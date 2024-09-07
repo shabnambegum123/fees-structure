@@ -4,10 +4,9 @@ const studentProfile = require("../Database/modal/studentprofile");
 const joi = require("joi");
 const staffprofile = require("../Database/modal/staffprofile");
 
-
 const verifyToken = async (req, res, next) => {
   try {
-    console.log('hii')
+   
     var token = req.headers.authorization;
 
     var Token = jwt.verify(token, process.env.secretKey);
@@ -62,18 +61,16 @@ const verifyRole = (role = []) =>
       var token = req.headers.authorization;
 
       var Token = jwt.verify(token, process.env.secretKey);
-      
-      if (Token.Role == role ) {
-         
+     
+      if ( role.includes(Token.Role)) {
+           
         next()
-
-      }
-       else  {
+      } else {
         res.status(400).json({
           status: 400,
-          message: "error",
+          message:"error",
           data: {},
-        });
+        }); 
       }
     } catch (error) {
       res.status(500).json({

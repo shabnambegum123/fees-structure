@@ -51,7 +51,7 @@ const updateFeeQuery = async (req,res,next) =>{
           },
         };
     
-        let { error, value } = await profileValidate.validate(req.query, options);
+        let { error, value } = await profileValidate.validate(req.body, options);
     
         if (error && Object.keys(error).length > 0) {
           return res.json({
