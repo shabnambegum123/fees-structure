@@ -99,7 +99,6 @@ router.get ("/join/get",getUsingJoin)
 // fees structure
 router.post(
   "/create/feestructure",
-  [verifyToken,verifyRole("Staff")],
   [createFee],
   createFeestructure
 ); // done
