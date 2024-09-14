@@ -262,62 +262,58 @@ const sendMailManagement = async (params) => {
   }
 };
 
-// const downloadSheetService = async (params) => {
-//   try {
-//     let Designation = params.Designation;
-//     let getDeptDetails = await studentProfile.findAll({
-//       where: { Designation: "BSC" },
-//       raw: true,
-//     });
-//     let heading = [
-//       [
-//         "profileId",
-//         "Name",
-//         "EmailId",
-//         "password",
-//         "Role",
-//         "is_FirstGraduate",
-//         "category",
-//         "currentYear",
-//         "feestructureId",
-//         "studentFeestrutureId",
-//       ],
-//     ];
-//     const data = [
-//       ["Name", "Age", "Email"],
-//       ["John Doe", 28, "john@example.com"],
-//       ["Jane Smith", 32, "jane@example.com"],
-//     ];
+const downloadSheetService = async (params) => {
+  try {
+    let Designation = params.Designation;
+    let getDeptDetails = await studentProfile.findAll({
+      where: { Designation: "BSC" },
+      raw: true,
+    });
+    let heading = [
+      [
+        "profileId",
+        "Name",
+        "EmailId",
+        "password",
+        "Role",
+        "is_FirstGraduate",
+        "category",
+        "currentYear",
+        "feestructureId",
+        "studentFeestrutureId",
+      ],
+    ];
+    const data = [
+      ["Name", "Age", "Email"],
+      ["John Doe", 28, "john@example.com"],
+      ["Jane Smith", 32, "jane@example.com"],
+    ];
 
-//     const workbook = XLSX.utils.book_new();
-//     const worksheet = XLSX.utils.aoa_to_sheet(data);
-//     XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
 
-//     XLSX.writeFile(workbook, "data.xlsx");
+    XLSX.writeFile(workbook, "data.xlsx");
     
-//     let buffer = true;
-//     if (buffer) {
-//       return {
-//         statusCode: 200,
-//         status: true,
-//         message: " sended",
-//         data: "buffer",
-//       };
-//     }
-//   } catch (error) {
-//     console.log("wdvqwef", error);
-//     return {
-//       statusCode: 400,
-//       status: false,
-//       message: error.message,
-//       data: {},
-//     };
-//   }
-// };
-
-
-
-
+    let buffer = true;
+    if (buffer) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: " sended",
+        data: "buffer",
+      };
+    }
+  } catch (error) {
+    console.log("wdvqwef", error);
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+      data: {},
+    };
+  }
+};
 
 
 
