@@ -2,7 +2,7 @@ const { date } = require("joi");
 const feestructure = require("../Database/modal/feestructure");
 const studentProfile = require("../Database/modal/studentprofile");
 
-const { axiosFunction } = require("../axios");
+const { axiosFunction } = require("../helpers/axios");
 const { Op } = require("sequelize");
 const { pagaMetaService } = require("../helpers/pagination");
 const XLSX = require("xlsx");

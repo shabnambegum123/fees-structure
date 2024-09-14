@@ -4,10 +4,10 @@ const { generatePassword } = require("../password/bcrypt");
 const jwt = require("jsonwebtoken");
 const { param } = require("../Router/router");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-const { generateToken } = require("../token");
+const { generateToken } = require("../helpers/token");
 const studentProfile = require("../Database/modal/studentprofile");
 const { default: axios, all } = require("axios");
-const { PendingMail, axiosFunction } = require("../axios");
+const { PendingMail, axiosFunction } = require("../helpers/axios");
 const { pagaMetaService } = require("../helpers/pagination");
 // create staffProfile
 const createstaffprofile = async (params) => {

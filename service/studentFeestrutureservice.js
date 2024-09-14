@@ -1,6 +1,6 @@
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const { pagaMetaService } = require("../helpers/pagination");
-const {FetchData} = require("../axios")
+const {FetchData} = require("../helpers/axios")
 //not createsd studentFeestruture created in students profile service
 const createstudentFeeStructure = async (params) => {
   try {

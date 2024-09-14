@@ -5,7 +5,7 @@ const {
   notificationGet,
   notificationDelete,
   FetchDataApi
-} = require("./InernalService/internalApi");
+} = require("../InernalService/internalApi");
 const { AxiosCreate } = require("./AxiosFile");
 
 const axiosFunction = async function (data, url, Email) {
