@@ -2,7 +2,7 @@ const express = require("express");
 let app = express();
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./Util/swagger");
-const downloadSheetService = require('./service/feeStructureservice')
+
 const bodyparser = require("body-parser");
 
 app.use(bodyparser.json());
@@ -15,8 +15,6 @@ dotenv.config();
 const router = require("./Router/router");
 
 app.use(router);
-app.get('/download-sheet', downloadSheetService)
-
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
@@ -32,6 +30,7 @@ app.get('/download-sheet', downloadSheetService)
 // process.env.host = db.host
 // process.env.password = db.password
 // process.env.user = db.user
+
 
 
 
