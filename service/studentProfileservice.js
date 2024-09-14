@@ -10,7 +10,7 @@ const { default: axios, all } = require("axios");
 const path = require("path");
 const { generateToken } = require("../token");
 const { raw } = require("body-parser");
-const { axiosFunction } = require("../axios");
+const { axiosFunction,updateStudentNotification, createStudentNotification, getStudentNotification,DeleteStudentNotification } = require("../axios");
 const { pagaMetaService } = require("../helpers/pagination");
 const { string } = require("joi");
 const { param } = require("../Router/router");
@@ -18,6 +18,7 @@ const fs = require("fs");
 var xlsx = require("xlsx");
 const Sequelize = require("sequelize");
 const sequelize = require("../Database/database");
+const { profile } = require("console");
 const Op = Sequelize.Op;
 
 // create student profile
@@ -215,7 +216,39 @@ const createstudent = async (params) => {
                 createstudentfeestructure.studentFeestrutureId,
             },
             { where: { profileId: result.profileId } }
-          );
+          )
+       console.log(result,"897087kjghj")
+          let passData = {
+            Name: result.Name,
+            EmailId: result.EmailId,
+            password: result.password,
+            mobileNumber: result.mobileNumber,
+            Role: result.Role,
+            Designation: result.Designation,
+            is_FirstGraduate:result. is_FirstGraduate ,
+            category: result.category,
+            currentYear: result.currentYear,
+            feestructureId: result.feestructureId,
+            profileId: result.profileId,
+            is_deleted: result.is_deleted,
+            is_suspended: result.is_suspended,
+          }
+          const axios = await createStudentNotification( passData);
+
+          // if (axios) {
+          //   return {
+          //     statusCode: 200,
+          //     status: true,
+          //     message: "sended",
+          //     data: {},
+          //   };
+          // } else {
+          //   return {
+          //     statusCode: 400,
+          //     status: true,
+          //     message: "error",
+          //     data: {},
+          //   };
 
           if (updatestudentprofile) {
             return {
@@ -267,7 +300,13 @@ const updatestudent = async (params) => {
     var result = await studentProfile.update(params, {
       where: { profileId: params.profileId },
       returning: true,
-    });
+    })
+    
+   let passData ={
+   ID : params.ID,
+    Name : "hii"
+   }
+    const axios = await updateStudentNotification( passData);
 
     if (result) {
       return {
@@ -464,7 +503,7 @@ const getByIdstudent = async (params) => {
   console.log(params);
   try {
     let profileId = params.profileId;
-    let result = await studentProfile.findOne({
+    var result = await studentProfile.findOne({
       attributes: [
         "Name",
         "EmailId",
@@ -479,14 +518,16 @@ const getByIdstudent = async (params) => {
       where: {
         profileId: profileId,
       },
-    });
+    })
+
+   const axios = await  getStudentNotification (result)
 
     if (result) {
       return {
         statusCode: 200,
         status: true,
         message: "sended",
-        data: result,
+        data: axios.data,
       };
     } else {
       return {
@@ -499,7 +540,7 @@ const getByIdstudent = async (params) => {
   } catch (error) {
     return {
       status: 400,
-      message: "error",
+      message: error.message,
       data: {},
     };
   }
@@ -509,19 +550,30 @@ const getByIdstudent = async (params) => {
 
 const deletestudent = async (params) => {
   try {
-    let profileId = params.profileId;
-    let result = await studentProfile.update(
+    
+    var profileId = params.profileId;
+    var result = await studentProfile.update(
       { is_deleted: "true" },
       {
         where: { profileId: profileId },
       }
-    );
+    )
+    // let value ={
+    //   profileId : params.profileId,
+    //   is_deleted : true
+    // }
+
+    let value = {
+      ID : params.ID
+    }
+
+    const axios = await  DeleteStudentNotification (value)
     if (result) {
       return {
         statusCode: 200,
         status: true,
         message: "deleted",
-        data: result,
+        data: {},
       };
     } else {
       return {
@@ -1042,7 +1094,7 @@ const PDFformatService = async (params) => {
       Name: params.Name,
       Designation: params.Designation,
       currentYear: params.currentYear,
-    };
+    }
 
     let url = process.env.PdfUrl;
     const axios = await axiosFunction(data, url, params.EmailId);

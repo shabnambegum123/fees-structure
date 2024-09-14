@@ -1,0 +1,118 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Feestructure Project",
+    "description": "Feestructure Project Api's",
+    "license": {
+      "name": "JWT",
+      "url": "http://localhost/swagger/js"
+    }
+  },
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "Bearer": {
+      "name": "Authorization",
+      "in": "header",
+      "type": "apiKey",
+      "description": "JWT Authorization header"
+    }
+  },
+  "paths": {
+    "/create/staff": {
+      "post": {
+        "tags": ["STAFF MODULE"],
+        "security": [{ "Bearer": [] }],
+        "summary": "Staff Page",
+        "parameters": [
+          {
+            "name": "adminCreate",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/profileCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a JSON response with submitted Aman form details.",
+            "schema": { "$ref": "#/definitions/response" }
+          },
+          "404": {
+            "description": "Validation failure.",
+            "schema": {
+              "$ref": "#/definitions/validationError"
+            }
+          },
+          "default": {
+            "description": "Unexpected error.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "details": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "validationError": {
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "profileCreate": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "EmailId": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "Role": {
+          "type": "string"
+        },
+        "Designation": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "currentYear": {
+          "type": "string"
+        },
+        "feestructureId": {
+          "type": "number"
+        },
+        "studentFeestrutureId": {
+          "type": "number"
+        },
+        "mobileNumber": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

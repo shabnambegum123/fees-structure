@@ -1,3 +1,4 @@
+const path = require("path");
 const {
   createfeestructureService,
   updatefeestructureService,
@@ -5,6 +6,7 @@ const {
   listfeestructureService,
   deletefeestructureService,
   sendMailManagement,
+  downloadSheetService
 } = require("../service/feeStructureservice");
 
 const createFeestructure = async (req, res) => {
@@ -120,7 +122,37 @@ const managementMail = async (req, res) => {
       data: result.data,
     });
   }
-};
+}
+
+
+const downloadSheet = async (req,res) =>{
+  const datas = req.body;
+  
+  const result = await downloadSheetService(datas);
+
+  let paths = path.join("C:/Users/Shabnam/Intern codes/files/fees-structure/data.xlsx")
+
+  console.log("path" , paths)
+
+  res.setHeader(
+    "Content-Type",
+    "application/data.xlsx"
+  );
+
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+}
 
 module.exports = {
   createFeestructure,
@@ -129,6 +161,7 @@ module.exports = {
   getByIdFeestructure,
   listFeestructure,
   managementMail,
+  downloadSheet
 };
 
 // console.log("hii")

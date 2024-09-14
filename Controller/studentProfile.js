@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   let params = req.body;
   params.profileId = req.user.profileId;
-
+  params.ID = req.query.ID
   const result = await updatestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -50,9 +50,9 @@ const updateUser = async (req, res) => {
       status: result.statusCode,
       message: result.message,
       data: result.data,
-    });
+    })
   }
-};
+}
 
 const listUser = async (req, res) => {
   let datas = req.query;
@@ -95,7 +95,7 @@ const getById = async (req, res) => {
 const deleteUser = async (req, res) => {
   let params = req.body;
   params.profileId = req.user.profileId;
-
+   params.ID = req.query.ID
   const result = await deletestudent(params);
   if (result.status) {
     res.status(result.statusCode).json({

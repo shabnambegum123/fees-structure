@@ -503,7 +503,9 @@ const updatePaidFeeservice = async (params) => {
       data: {},
     };
   }
-};
+}
+
+
 
 module.exports = {
   createstaffprofile,

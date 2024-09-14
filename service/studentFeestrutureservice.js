@@ -1,5 +1,6 @@
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-const {pagaMetaService} = require("../helpers/pagination")
+const { pagaMetaService } = require("../helpers/pagination");
+const {FetchData} = require("../axios")
 //not createsd studentFeestruture created in students profile service
 const createstudentFeeStructure = async (params) => {
   try {
@@ -40,11 +41,11 @@ const createstudentFeeStructure = async (params) => {
 //To update student feestructure
 const updatestudentFeeStructure = async (params) => {
   try {
-    console.log("hii")
+    console.log("hii");
     if (params.password) {
       params.password = await generatePassword(params.password);
     }
-   
+
     var result = await studentFeestruture.update(params, {
       where: { studentFeestrutureId: params.studentFeestrutureId },
       returning: true,
@@ -121,9 +122,9 @@ const getByIdstudentFeeStructure = async (params) => {
 const deletestudentFeeStructure = async (params) => {
   try {
     let studentFeestrutureId = params.studentFeestrutureId;
-    let result =await studentFeestruture.update(
+    let result = await studentFeestruture.update(
       { is_deleted: "true" },
-      { where: {studentFeestrutureId: studentFeestrutureId  } }
+      { where: { studentFeestrutureId: studentFeestrutureId } }
     );
     if (result) {
       return {
@@ -191,7 +192,7 @@ const liststudentFeestructure = async (params) => {
       data: error,
     };
   }
-}
+};
 
 // get student by Id // cmmand
 // const getByIdstudent = async (params) => {
@@ -223,11 +224,43 @@ const liststudentFeestructure = async (params) => {
 //       data: {},
 //     };
 //   }
-// };
+// }
+
+const fetchDataService = async (params) => {
+  try {
+     const axios = await FetchData(params);
+     if (axios) {
+            return {
+              statusCode: 200,
+              status: true,
+              message: "sended",
+              data:axios.data,
+            };
+          } else {
+            return {
+              statusCode: 404,
+              status: false,
+              message: "data not found",
+              data: {},
+            };
+          }
+  } catch (error) {
+    return {
+      status: 400,
+      message: error.message,
+      data: {},
+    };
+  }
+}
+
+
+
+
 module.exports = {
   liststudentFeestructure,
   createstudentFeeStructure,
   updatestudentFeeStructure,
   getByIdstudentFeeStructure,
   deletestudentFeeStructure,
+  fetchDataService,
 };

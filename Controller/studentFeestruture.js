@@ -2,7 +2,7 @@
 
 const {
   createstudentFeeStructure,updatestudentFeeStructure,getByIdstudentFeeStructure,deletestudentFeeStructure,
-  liststudentFeestructure
+  liststudentFeestructure,fetchDataService
 } = require("../service/studentFeestrutureservice");
 
 const createstudentFee = async (req, res) => {
@@ -97,6 +97,25 @@ const deletestudentFee = async (req,res) => {
       data: result.data,
     });
   }
-};
+}
 
-module.exports = { createstudentFee, updatestudentFee,   liststudentfee,  getByIdstudentFee, deletestudentFee };
+
+const fetchData = async (req,res) => {
+  let data = req.query
+   const result = await fetchDataService(data);
+   if (result.status) {
+     res.status(result.statusCode).json({
+       status: result.statusCode,
+       message: result.message,
+       data: result.data,
+     });
+   } else {
+     res.status(result.statusCode).json({
+       status: result.statusCode,
+       message: result.message,
+       data: result.data,
+     });
+   }
+ };
+
+module.exports = { createstudentFee, updatestudentFee,   liststudentfee,  getByIdstudentFee, deletestudentFee,fetchData };

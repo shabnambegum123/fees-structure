@@ -1,10 +1,11 @@
 const { date } = require("joi");
 const feestructure = require("../Database/modal/feestructure");
 const studentProfile = require("../Database/modal/studentprofile");
-const { default: axios, all } = require("axios");
+
 const { axiosFunction } = require("../axios");
 const { Op } = require("sequelize");
 const { pagaMetaService } = require("../helpers/pagination");
+const XLSX = require("xlsx");
 // create fee structure
 
 const createfeestructureService = async (params) => {
@@ -48,7 +49,7 @@ const createfeestructureService = async (params) => {
 const updatefeestructureService = async (params) => {
   try {
     let studentFeestrutureId = params.studentFeestrutureId;
-   console.log(studentFeestrutureId)
+    console.log(studentFeestrutureId);
     if (params.password) {
       params.password = await generatePassword(params.password);
     }
@@ -85,7 +86,6 @@ const updatefeestructureService = async (params) => {
 // list Profile and pagenation
 const listfeestructureService = async (params) => {
   try {
-   
     var whereQuery = {};
     let feestrutureId = params.feestrutureId;
 
@@ -147,7 +147,7 @@ const getByIdfeestructureService = async (params) => {
       where: {
         feestrutureId: feestrutureId,
       },
-    })
+    });
 
     if (result) {
       return {
@@ -177,7 +177,7 @@ const getByIdfeestructureService = async (params) => {
 const deletefeestructureService = async (params) => {
   try {
     let feestrutureId = params.feestrutureId;
-    let result = feestructure.update(
+    let result = await feestructure.update(
       { is_deleted: true },
       { where: { feestrutureId: feestrutureId } }
     );
@@ -208,7 +208,6 @@ const deletefeestructureService = async (params) => {
 // mangement should recieve the student details which where created on that day
 const sendMailManagement = async (params) => {
   try {
-
     let fromDate = params.fromDate;
     let toDate = params.toDate;
     const find = await studentProfile.findAll({
@@ -225,9 +224,9 @@ const sendMailManagement = async (params) => {
     if (find) {
       for (let item of find) {
         let url = process.env.managementUrl;
-        console.log("testing" , url)
-        let EmailId = "shabnambegum227@gmail.com" 
-        const axios = await axiosFunction(item, url,EmailId);
+        console.log("testing", url);
+        let EmailId = "shabnambegum227@gmail.com";
+        const axios = await axiosFunction(item, url, EmailId);
 
         if (axios) {
           return {
@@ -253,7 +252,7 @@ const sendMailManagement = async (params) => {
       };
     }
   } catch (error) {
-    console.log("error" , error)
+    console.log("error", error);
     return {
       statusCode: 400,
       status: false,
@@ -263,6 +262,67 @@ const sendMailManagement = async (params) => {
   }
 };
 
+// const downloadSheetService = async (params) => {
+//   try {
+//     let Designation = params.Designation;
+//     let getDeptDetails = await studentProfile.findAll({
+//       where: { Designation: "BSC" },
+//       raw: true,
+//     });
+//     let heading = [
+//       [
+//         "profileId",
+//         "Name",
+//         "EmailId",
+//         "password",
+//         "Role",
+//         "is_FirstGraduate",
+//         "category",
+//         "currentYear",
+//         "feestructureId",
+//         "studentFeestrutureId",
+//       ],
+//     ];
+//     const data = [
+//       ["Name", "Age", "Email"],
+//       ["John Doe", 28, "john@example.com"],
+//       ["Jane Smith", 32, "jane@example.com"],
+//     ];
+
+//     const workbook = XLSX.utils.book_new();
+//     const worksheet = XLSX.utils.aoa_to_sheet(data);
+//     XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+
+//     XLSX.writeFile(workbook, "data.xlsx");
+    
+//     let buffer = true;
+//     if (buffer) {
+//       return {
+//         statusCode: 200,
+//         status: true,
+//         message: " sended",
+//         data: "buffer",
+//       };
+//     }
+//   } catch (error) {
+//     console.log("wdvqwef", error);
+//     return {
+//       statusCode: 400,
+//       status: false,
+//       message: error.message,
+//       data: {},
+//     };
+//   }
+// };
+
+
+
+
+
+
+
+
+
 module.exports = {
   createfeestructureService,
   updatefeestructureService,
@@ -270,4 +330,5 @@ module.exports = {
   listfeestructureService,
   deletefeestructureService,
   sendMailManagement,
+  downloadSheetService,
 };

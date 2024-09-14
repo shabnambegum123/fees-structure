@@ -1,4 +1,26 @@
 const router = require("express").Router();
+const swaggerJsdoc = require("../Util/swagger")
+/**
+ * @swagger
+//  * /api/profile
+//  * get:
+//  * summary:Fetch user profile details
+//  * description:fetch profile details of a user
+//  * tags :
+//  *      profile
+//  * response :
+//  *   '200':
+//  * description : User profile fetched successfully
+//  * '400':
+//  * description:Unable to fetch user profile data
+//  */
+router.get("/student/list",(req,res)=>{
+  const demoUser = {
+    name:"hii",
+    email:"hii123@gmail.com"
+  }
+  res.status(200).json(demoUser)
+})
 const multer = require("multer")
 const {upload} = require("../Multer/multer")
 const { verifyToken, verifyRole } = require("../middleWare/Authentication");
@@ -45,6 +67,7 @@ const {
   getByIdFeestructure,
   listFeestructure,
   managementMail,
+  downloadSheet
 } = require("../Controller/feestructure");
 
 const {
@@ -53,6 +76,7 @@ const {
   getByIdstudentFee,
   liststudentfee,
   deletestudentFee,
+  fetchData
 } = require("../Controller/studentFeestruture");
 
 const {
@@ -66,6 +90,7 @@ const {
   mailsend,
   updatePaidFees
 } = require("../Controller/staffprofile");
+const swaggerJSDoc = require("swagger-jsdoc");
 
 // student profile
 
@@ -82,9 +107,9 @@ const {
 // })
 
 //let upload = multer({ storage: setStorage })
-router.post("/bulk/Create", upload.single('file'),bulkCreate)
-router.post("/create/Profile", [studentCreate],[studentCreateQuery], createUser);//done
 
+router.post("/bulk/Create", upload.single('file'),bulkCreate)
+router.post("/create/Profile", createUser);//done
 router.post("/login/user",[studentLogin], loginUser);// done
 router.put("/update/user", [verifyToken,verifyRole("Student")], [updateStudent], updateUser);//done
 router.get("/student/list", [verifyToken,verifyRole("Student")], listUser);// done , [liststudentId]
@@ -96,7 +121,11 @@ router.post("/forget/password",[forgetPasswordValidity], forgetPassword);//done
 router.put("/change/password", [verifyToken,verifyRole("Student")],[changePasswordValidity], changePassword)// done
 router.get("/PDF/email", [verifyToken,verifyRole("Student")],PDFformat)
 router.get ("/join/get",getUsingJoin)
+
+
+
 // fees structure
+
 router.post(
   "/create/feestructure",
   [createFee],
@@ -107,9 +136,9 @@ router.get("/list/feestructure", [verifyToken,verifyRole(["Staff","Student"])], 
 router.get("/byId/feestructure", [verifyToken,verifyRole("Staff")], [getByIdFee], getByIdFeestructure); //done
 router.delete("/delete/feestructure", [verifyToken],verifyRole("Staff"),[DeleteFeeQuery], deleteFeestructure);//done
 router.get("/send/management", [verifyToken,verifyRole("Staff")], managementMail);// error
+router.get("/downloading/sheet",downloadSheet)
 
 // studentFeeStructure
-
 router.post("/create/studentfee", [verifyToken,verifyRole("Staff")], createstudentFee);// not created using this api
 router.put(
   "/update/studentfee",
@@ -117,6 +146,7 @@ router.put(
 router.get("/getId/studentfee", [verifyToken,verifyRole("Staff")],[getByIdstudentFeeQuery], getByIdstudentFee);// done
 router.get("/list/studentfee", [verifyToken,verifyRole("Staff")], [listByIdFee], liststudentfee);// done
 router.delete("/delete/studentfee", [verifyToken,verifyRole("Staff")],[updateFeestructureQuery], deletestudentFee);// done
+router.get("/fetchData/axios",fetchData)
 
 // staff profile
 router.post("/create/staff",[staffCreate], createstaff);// done

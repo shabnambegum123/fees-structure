@@ -6,13 +6,14 @@ const feestructure = require("./feestructure");
 const studentFeestruture = require("./studentFeestruture");
 
 sequelize
-  .sync({ force: false })
+  .sync({ force:false })
   .then(() => {
     console.log("connected");
   })
   .catch((error) => {
     console.log(error);
-  });
+  })
+ 
 
 module.exports = sequelize;
 
@@ -20,3 +21,4 @@ module.exports = sequelize;
 
 // let result = Object.assign({},data)
 // console.log(result)
+

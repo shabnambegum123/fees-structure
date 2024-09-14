@@ -15,5 +15,3 @@ let setStorage = multer.diskStorage({
 let upload = multer({ storage: setStorage })
 
 module.exports ={upload}
-
-
