@@ -4,17 +4,16 @@ const {
   notificationUpdate,
   notificationGet,
   notificationDelete,
-  FetchDataApi
+  FetchDataApi,
 } = require("../InernalService/internalApi");
 const { AxiosCreate } = require("./AxiosFile");
 
 const axiosFunction = async function (data, url, Email) {
-  data = JSON.stringify(data);
   let sendData = await axios.post(url, {
     find: data,
     EmailId: Email,
   });
-  if (sendData) return "Email sent sucessfully";
+  if (sendData) console.log("Email sent sucessfully");
   else {
     return "something Went wrong";
   }
@@ -30,18 +29,18 @@ const createStudentNotification = async function (data) {
   else {
     return "something Went wrong";
   }
-};
+}
 
 const updateStudentNotification = async function (data) {
   // data = JSON.stringify(data);
-   console.log(data)
+  console.log(data);
   const Api = await notificationUpdate();
   Api.data = data;
   const axios = await AxiosCreate(Api);
 
   if (Api) return "sended";
   else {
-    return "something Went wrong"
+    return "something Went wrong";
   }
 };
 
@@ -49,18 +48,18 @@ const getStudentNotification = async function (data) {
   const Api = await notificationGet();
   // Api.data = data;
   const axios = await AxiosCreate(Api);
-    console.log(axios)
+  console.log(axios);
   if (Api) return axios;
   else {
-    return "something Went wrong"
+    return "something Went wrong";
   }
-}
+};
 
 const DeleteStudentNotification = async function (data) {
   const Api = await notificationDelete();
-  
+
   Api.data = data;
-  const axios = await AxiosCreate(Api)
+  const axios = await AxiosCreate(Api);
   if (Api) return "DEleted";
   else {
     return "something Went wrong";
@@ -70,11 +69,11 @@ const DeleteStudentNotification = async function (data) {
 const FetchData = async function (data) {
   const Api = await FetchDataApi();
   Api.data = data;
-  const axios = await AxiosCreate(Api)
-console.log("axios" , axios)
+  const axios = await AxiosCreate(Api);
+  console.log("axios", axios);
   if (Api) return axios;
   else {
-    return "something Went wrong"
+    return "something Went wrong";
   }
 };
 module.exports = {
@@ -83,5 +82,5 @@ module.exports = {
   updateStudentNotification,
   getStudentNotification,
   DeleteStudentNotification,
-  FetchData
+  FetchData,
 };

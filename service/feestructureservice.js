@@ -210,7 +210,7 @@ const sendMailManagement = async (params) => {
   try {
     let fromDate = params.fromDate;
     let toDate = params.toDate;
-    const find = await studentProfile.findAll({
+    var find = await studentProfile.findAll({
       where: {
         createdAt: {
           [Op.gt]: new Date(fromDate), //"2024-08-18"
@@ -219,38 +219,24 @@ const sendMailManagement = async (params) => {
       },
       raw: true,
     });
-    console.log("find", find);
+  
 
     if (find) {
-      for (let item of find) {
+      for (let i = 0;i<find.length;i++) {
+      
         let url = process.env.managementUrl;
-        console.log("testing", url);
-        let EmailId = "shabnambegum227@gmail.com";
-        const axios = await axiosFunction(item, url, EmailId);
-
-        if (axios) {
-          return {
-            statusCode: 200,
-            status: true,
-            message: "login successful",
-            data: {},
-          };
-        } else {
-          return {
-            statusCode: 400,
-            status: true,
-            message: "user not found",
-            data: {},
-          };
-        }
+       
+        let EmailId = "kishore.t@doodleblue.in";
+     
+        const axios = await axiosFunction(find, url, EmailId);
       }
-    } else {
-      return {
-        status: 400,
-        message: "error",
-        data: {},
-      };
-    }
+    // } else {
+    //   return {
+    //     status: 400,
+    //     message: "error",
+    //     data: {},
+    //   };
+     }
   } catch (error) {
     console.log("error", error);
     return {
@@ -262,61 +248,90 @@ const sendMailManagement = async (params) => {
   }
 };
 
-const downloadSheetService = async (params) => {
-  try {
-    let Designation = params.Designation;
-    let getDeptDetails = await studentProfile.findAll({
-      where: { Designation: "BSC" },
-      raw: true,
-    });
-    let heading = [
-      [
-        "profileId",
-        "Name",
-        "EmailId",
-        "password",
-        "Role",
-        "is_FirstGraduate",
-        "category",
-        "currentYear",
-        "feestructureId",
-        "studentFeestrutureId",
-      ],
-    ];
-    const data = [
-      ["Name", "Age", "Email"],
-      ["John Doe", 28, "john@example.com"],
-      ["Jane Smith", 32, "jane@example.com"],
-    ];
+const downloadSheetService = async (req, res) => {
 
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
-
-    XLSX.writeFile(workbook, "data.xlsx");
-    
-    let buffer = true;
-    if (buffer) {
+    try {
+      
+      const getDeptDetails = await studentProfile.findAll({
+        where: { Designation: "BSC" },
+        raw: true,
+      });
+  
+     
+      const heading = [
+        [
+          "profileId",
+          "Name",
+          "EmailId",
+          "password",
+          "Role",
+          "is_FirstGraduate",
+          "category",
+          "currentYear",
+          "feestructureId",
+          "studentFeestrutureId",
+        ],
+      ];
+  
+      const data = getDeptDetails.map((item) => [
+        item.profileId,
+        item.Name,
+        item.EmailId,
+        item.password,
+        item.Role,
+        item.is_FirstGraduate,
+        item.category,
+        item.currentYear,
+        item.feestructureId,
+        item.studentFeestrutureId,
+      ]);
+  
+      
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.aoa_to_sheet([...heading, ...data]);
+      worksheet['!cols'] = [
+        { wpx: 100 }, 
+        { wpx: 150 }, 
+        { wpx: 200 }, 
+        { wpx: 500 }, 
+        { wpx: 100 }, 
+        { wpx: 150 }, 
+        { wpx: 120 }, 
+        { wpx: 100 }, 
+        { wpx: 150 }, 
+        { wpx: 180 } , 
+        { wpx: 180 }
+      ];
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  
+     
+      const fileBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "buffer",
+      });
+  
       return {
-        statusCode: 200,
+        statusCode: 200, 
         status: true,
-        message: " sended",
-        data: "buffer",
+        message: "File generated successfully",
+        data: fileBuffer,
+      };
+    } catch (error) {
+      console.error("Error generating file:", error.message);
+      return {
+        statusCode: 500, 
+        status: false,
+        message: error.message,
+        data: {},
       };
     }
-  } catch (error) {
-    console.log("wdvqwef", error);
-    return {
-      statusCode: 400,
-      status: false,
-      message: error.message,
-      data: {},
-    };
-  }
-};
+  };
+  
+  
+  
+  
 
-
-
+  
 
 
 module.exports = {
@@ -328,3 +343,43 @@ module.exports = {
   sendMailManagement,
   downloadSheetService,
 };
+// let Designation = params.Designation;
+// let getDeptDetails = await studentProfile.findAll({
+//   where: { Designation: "BSC" },
+//   raw: true,
+// });
+// let heading = [
+//   [
+//     "profileId",
+//     "Name",
+//     "EmailId",
+//     "password",
+//     "Role",
+//     "is_FirstGraduate",
+//     "category",
+//     "currentYear",
+//     "feestructureId",
+//     "studentFeestrutureId",
+//   ],
+// ];
+// const data = [
+//   ["Name", "Age", "Email"],
+//   ["John Doe", 28, "john@example.com"],
+//   ["Jane Smith", 32, "jane@example.com"],
+// ];
+
+// const workbook = XLSX.utils.book_new();
+// const worksheet = XLSX.utils.aoa_to_sheet(data);
+// XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1");
+
+// XLSX.writeFile(workbook, "data.xlsx");
+
+// let buffer = true;
+// if (buffer) {
+//   return {
+//     statusCode: 200,
+//     status: true,
+//     message: " sended",
+//     data: "buffer",
+//   };
+// }

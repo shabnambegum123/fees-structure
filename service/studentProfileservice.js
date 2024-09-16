@@ -333,76 +333,77 @@ const updatestudent = async (params) => {
 
 // list student profile and pagenation
 const liststudent = async (params) => {
+  
   try {
-    // let whereQuery = {};
-    // if (params.is_deleted) {
-    //   whereQuery = {
-    //     is_deleted: Boolean(params.is_deleted),
-    //   };
-    // }
-    // if (params.search) {
-    //   whereQuery[Op.or] = [
-    //     {
-    //       Name: {
-    //         [Op.like]: startsWith(params.search),
-    //       },
-    //     },
-    //     {
-    //       EmailId: {
-    //         [Op.like]: params.search,
-    //       },
-    //     },
-    //     {
-    //       profileId: {
-    //         [Op.like]: params.search,
-    //       },
-    //     },
-    //   ];
-    // }
-    // if (params.key && params.order) {
-    //   var order = { order: [[params.key, params.order]] };
-    // } else {
-    //   var order = { order: [["createdAt", "DESC"]] };
-    // }
-    // if (params.staffId) {
-    //   whereQuery.staffId = params.staffId;
-    // }
-    // let result;
-    // if (params.page && params.limit) {
-    //   result = await studentProfile.findAll({
-    //     where: whereQuery,
-    //     limit: +params.limit,
-    //     offset: (params?.page - 1) * params?.limit,
-    //     order: order.order,
-    //   });
-    //   data = await pagaMetaService(
-    //     +params.page,
-    //     +params.limit,
-    //     result,
-    //     result.length
-    //   );
-    // } else {
-    //   result = await studentProfile.findAll({
-    //     where: whereQuery,
-    //   });
-    //   data = result;
-    // }
-    // if (result.length > 0) {
-    //   return {
-    //     statusCode: 200,
-    //     status: true,
-    //     message: "sended",
-    //     data: data
-    //   };
-    // } else {
-    //   return {
-    //     statusCode: 400,
-    //     status: false,
-    //     message: "data not found",
-    //     data: {},
-    //   };
-    // }
-    // }
+    let whereQuery = {};
+    if (params.is_deleted) {
+      whereQuery = {
+        is_deleted: Boolean(params.is_deleted),
+      };
+    }
+    if (params.search) {
+      whereQuery[Op.or] = [
+        {
+          Name: {
+            [Op.like]: startsWith(params.search),
+          },
+        },
+        {
+          EmailId: {
+            [Op.like]: params.search,
+          },
+        },
+        {
+          profileId: {
+            [Op.like]: params.search,
+          },
+        },
+      ];
+    }
+    if (params.key && params.order) {
+      var order = { order: [[params.key, params.order]] };
+    } else {
+      var order = { order: [["createdAt", "DESC"]] };
+    }
+    if (params.staffId) {
+      whereQuery.staffId = params.staffId;
+    }
+    let result;
+    if (params.page && params.limit) {
+      result = await studentProfile.findAll({
+        where: whereQuery,
+        limit: +params.limit,
+        offset: (params?.page - 1) * params?.limit,
+        order: order.order,
+      });
+      data = await pagaMetaService(
+        +params.page,
+        +params.limit,
+        result,
+        result.length
+      );
+    } else {
+      result = await studentProfile.findAll({
+        where: whereQuery,
+      });
+      data = result;
+    }
+    if (result.length > 0) {
+      return {
+        statusCode: 200,
+        status: true,
+        message: "sended",
+        data: data
+      };
+    } else {
+      return {
+        statusCode: 400,
+        status: false,
+        message: "data not found",
+        data: {},
+      };
+    }
+    
     // console.log(params.Name);
     // let search = await studentProfile.findAll({
     //   where: whereQuery,
@@ -414,79 +415,7 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data: search,
     // }
-    // op.eq checks the number is equal
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.eq]:params.profileId}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.is defines the null value
-    // let result = await studentProfile.findAll({where:{feestructureId:{[Op.is]:null}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.gt gives the profileId is greater than the given value
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.gt]:5}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.gte
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.gt]:5}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // Op.between
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.between]:[5,6]}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.notIn except that value
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.notIn]:[5,6]}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.in checks the value exists in list or not
-    // let result = await studentProfile.findAll({where:{profileId:{[Op.in]:[5,6]}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // op.like exact name should must be given
-    // let result = await studentProfile.findAll({where:{Name:{[Op.like]:params.Name}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
-    // //op.iLike
-    // let result = await studentProfile.findAll({where:{Name:{[Op.contains
-    // ]:params.Name}}})
-    // return {
-    //   statusCode: 200,
-    //   status: true,
-    //   message: "sended",
-    //   data:result,
-    // };
+   
   } catch (error) {
     console.log("qewgqewf", error);
     return {

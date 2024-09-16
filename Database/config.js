@@ -10,7 +10,7 @@ module.exports = {
           password: "1511",
           host: "127.0.0.1",
           dialect: "mysql",
-        };
+        } 
 
       case "postgres":
         console.log("resylt" , result)

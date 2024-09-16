@@ -6,7 +6,7 @@ const {
   listfeestructureService,
   deletefeestructureService,
   sendMailManagement,
-  downloadSheetService
+  downloadSheetService,
 } = require("../service/feeStructureservice");
 
 const createFeestructure = async (req, res) => {
@@ -29,9 +29,9 @@ const createFeestructure = async (req, res) => {
 
 const updateFeestructure = async (req, res) => {
   let params = req.body;
-  
+
   params.feestrutureId = req.query.feestrutureId;
-const result = await updatefeestructureService(params);
+  const result = await updatefeestructureService(params);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -50,7 +50,6 @@ const result = await updatefeestructureService(params);
 const listFeestructure = async (req, res) => {
   let params = req.query;
 
-  
   const result = await listfeestructureService(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -69,7 +68,7 @@ const listFeestructure = async (req, res) => {
 
 const getByIdFeestructure = async (req, res) => {
   let params = req.body;
-    params.feestrutureId = req.query.feestrutureId;
+  params.feestrutureId = req.query.feestrutureId;
   const result = await getByIdfeestructureService(params);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -105,7 +104,6 @@ const deleteFeestructure = async (req, res) => {
 };
 
 const managementMail = async (req, res) => {
-
   const datas = req.body;
 
   const result = await sendMailManagement(datas);
@@ -122,37 +120,33 @@ const managementMail = async (req, res) => {
       data: result.data,
     });
   }
-}
+};
 
+const downloadSheet = async (req, res) => {
+  try {
+    const result = await downloadSheetService();
 
-const downloadSheet = async (req,res) =>{
-  const datas = req.body;
+    if (result.status) {
+     
+      res.setHeader("Content-Disposition", "attachment; filename=data.xlsx");
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.send(result.data);
+    } else {
+     
+      res.status(result.statusCode).json({
+        status: result.status,
+        message: result.message,
+        data: result.data,
+      });
+    }
+  } catch (error) {
   
-  const result = await downloadSheetService(datas);
-
-  let paths = path.join("C:/Users/Shabnam/Intern codes/files/fees-structure/data.xlsx")
-
-  console.log("path" , paths)
-
-  res.setHeader(
-    "Content-Type",
-    "application/data.xlsx"
-  );
-
-  if (result.status) {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
-  } else {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
+   console.log(error)
   }
-}
+};
 
 module.exports = {
   createFeestructure,
@@ -161,7 +155,5 @@ module.exports = {
   getByIdFeestructure,
   listFeestructure,
   managementMail,
-  downloadSheet
+  downloadSheet,
 };
-
-// console.log("hii")

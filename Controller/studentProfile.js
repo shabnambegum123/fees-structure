@@ -55,14 +55,15 @@ const updateUser = async (req, res) => {
 }
 
 const listUser = async (req, res) => {
-  let datas = req.query;
-  const result = await liststudent(datas);
+  console.log("hello")
+  let datas = req.query
+  const result = await liststudent(datas)
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
       data: result.data,
-    });
+    })
   } else {
     res.status(result.statusCode).json({
       status: result.statusCode,

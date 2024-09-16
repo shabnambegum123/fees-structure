@@ -12,27 +12,27 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+
+let data = process.argv.slice(2)[0];
+
+console.log("qwjefq j2e" , data)
+
+let db = require("./Database/config"). function (data);
+
+process.env.database = db.database
+process.env.dialect = db.dialect
+process.env.host = db.host
+process.env.password = db.password
+process.env.user = db.user
+
+
 const router = require("./Router/router");
 
 app.use(router);
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-
-
-// let data = process.argv.slice(2)[0];
-
-// console.log("qwjefq j2e" , data)
-
-// let db = require("./Database/config"). function (data);
-
-// process.env.database = db.database
-// process.env.dialect = db.dialect
-// process.env.host = db.host
-// process.env.password = db.password
-// process.env.user = db.user
-
-
-
 
 require("./Database/modal/index");
 

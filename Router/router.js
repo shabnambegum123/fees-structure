@@ -1,26 +1,5 @@
 const router = require("express").Router();
-const swaggerJsdoc = require("../Util/swagger")
-/**
- * @swagger
-//  * /api/profile
-//  * get:
-//  * summary:Fetch user profile details
-//  * description:fetch profile details of a user
-//  * tags :
-//  *      profile
-//  * response :
-//  *   '200':
-//  * description : User profile fetched successfully
-//  * '400':
-//  * description:Unable to fetch user profile data
-//  */
-router.get("/student/list",(req,res)=>{
-  const demoUser = {
-    name:"hii",
-    email:"hii123@gmail.com"
-  }
-  res.status(200).json(demoUser)
-})
+
 const multer = require("multer")
 const {upload} = require("../Multer/multer")
 const { verifyToken, verifyRole } = require("../middleWare/Authentication");
@@ -90,42 +69,23 @@ const {
   mailsend,
   updatePaidFees
 } = require("../Controller/staffprofile");
-const swaggerJSDoc = require("swagger-jsdoc");
-
 // student profile
-
-// let setStorage = multer.diskStorage({
-
-//   destination: (req, file, cb) => {
-
-//       cb(null,'./Excelsheet')
-//   },
-//   filename: function (req, file, cb) {
-//       cb(null, file.originalname)
-
-//   }
-// })
-
-//let upload = multer({ storage: setStorage })
 
 router.post("/bulk/Create", upload.single('file'),bulkCreate)
 router.post("/create/Profile", createUser);//done
 router.post("/login/user",[studentLogin], loginUser);// done
 router.put("/update/user", [verifyToken,verifyRole("Student")], [updateStudent], updateUser);//done
-router.get("/student/list", [verifyToken,verifyRole("Student")], listUser);// done , [liststudentId]
+router.get("/student/list", [verifyToken,verifyRole("Student")], listUser)// done,error
 router.get("/byId", [verifyToken, verifyRole(["Student"])], getById)//done
 router.delete("/delete/user", [verifyToken,verifyRole("Student")], deleteUser);//done
-router.get("/email/studentFee", [verifyToken,verifyRole("Student")], verifyUser);//done (Email template)
+router.get("/email/studentFee", [verifyToken,verifyRole("Student")], verifyUser);//done 
 router.put("/reset/password", [verifyToken,verifyRole("Student")], [validatePassword], restPassword);
 router.post("/forget/password",[forgetPasswordValidity], forgetPassword);//done
 router.put("/change/password", [verifyToken,verifyRole("Student")],[changePasswordValidity], changePassword)// done
-router.get("/PDF/email", [verifyToken,verifyRole("Student")],PDFformat)
-router.get ("/join/get",getUsingJoin)
-
-
+router.get("/PDF/email", [verifyToken,verifyRole("Student")],PDFformat)// done
+router.get ("/join/get",getUsingJoin) // done
 
 // fees structure
-
 router.post(
   "/create/feestructure",
   [createFee],
@@ -136,7 +96,7 @@ router.get("/list/feestructure", [verifyToken,verifyRole(["Staff","Student"])], 
 router.get("/byId/feestructure", [verifyToken,verifyRole("Staff")], [getByIdFee], getByIdFeestructure); //done
 router.delete("/delete/feestructure", [verifyToken],verifyRole("Staff"),[DeleteFeeQuery], deleteFeestructure);//done
 router.get("/send/management", [verifyToken,verifyRole("Staff")], managementMail);// error
-router.get("/downloading/sheet",downloadSheet)
+router.get("/downloading/sheet",downloadSheet)// done
 
 // studentFeeStructure
 router.post("/create/studentfee", [verifyToken,verifyRole("Staff")], createstudentFee);// not created using this api
