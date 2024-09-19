@@ -2,6 +2,7 @@
 
 
 const  notificationCreate = async () =>{
+  
   method= 'POST',
   url= process.env.notificationService + "/create/notification",
   headers= {
@@ -13,12 +14,12 @@ const  notificationCreate = async () =>{
 }
 
 
-const  notificationUpdate = async () =>{
+const  notificationUpdate = async (token) =>{
   method= 'PUT',
   url= process.env.notificationService + "/update/notification",
   headers= {
     contentType: 'application/json',
-    authorization: ' Bearer token'
+    authorization: `${token}`
   },
   data =  {}
   return {method,url,headers}
@@ -59,4 +60,16 @@ const  FetchDataApi = async () =>{
   return {method,url,headers}
 }
 
-module.exports = {notificationCreate,notificationUpdate,notificationGet,notificationDelete,FetchDataApi}
+const managementApi = async (token) =>{
+  method= 'POST',
+  url= process.env.notificationService + "/management/send",
+  headers= {
+    contentType: 'application/json',
+    authorization: `${token}`
+  },
+  data =  {}
+  return {method,url,headers}
+}
+
+
+module.exports = {notificationCreate,notificationUpdate,notificationGet,notificationDelete,FetchDataApi,managementApi}

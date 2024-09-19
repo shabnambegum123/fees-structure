@@ -54,6 +54,46 @@
           }
         }
       }
+    },
+    "/update/staff": {
+      "put": {
+        "tags": ["STAFF MODULE"],
+        "security": [{ "Bearer": [] }],
+        "summary": "Update Staff Information",
+        "parameters": [
+          {
+            "name": "adminCreate",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/profileUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a JSON response with updated staff information.",
+            "schema": { "$ref": "#/definitions/response" }
+          },
+          "404": {
+            "description": "Staff not found.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "400": {
+            "description": "Validation failure.",
+            "schema": {
+              "$ref": "#/definitions/validationError"
+            }
+          },
+          "default": {
+            "description": "Unexpected error.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -113,6 +153,29 @@
           "type": "number"
         }
       }
+      
+    },
+    "profileUpdate": {
+      "type": "object",
+      "properties": {
+        "Name": { "type": "string" },
+        "EmailId": { "type": "string" },
+        "Role": { "type": "string" },
+        "Designation": { "type": "string" },
+        "category": { "type": "string" },
+        "currentYear": { "type": "string" },
+        "feestructureId": { "type": "number" },
+        "studentFeestrutureId": { "type": "number" },
+        "mobileNumber": { "type": "number" }
+      }
     }
   }
+
+
+  
 }
+
+
+
+
+

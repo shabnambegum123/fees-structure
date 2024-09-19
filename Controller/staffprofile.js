@@ -8,7 +8,8 @@ const {
   loginstaffProfile,
   staffToken,
   paymentmail,
-  updatePaidFeeservice
+  updatePaidFeeservice,
+  cryptoModuleService
 } = require("../service/staffProfileservice");
 
 const createstaff = async (req, res) => {
@@ -183,6 +184,36 @@ const updatePaidFees = async (req,res) =>{
   }
 }
 
+const cryptoModule = async (req,res) =>{
+  try {
+       let params = req.user
+
+      let result = await cryptoModuleService(params);
+  
+      if (result.status) {
+        res.status(result.statusCode).json({
+          status: result.statusCode,
+          message: result.message,
+          data: result.data,
+        });
+      } else {
+        res.status(result.statusCode).json({
+          status: result.statusCode,
+          message: result.message,
+          data: result.data,
+        });
+      }
+    } catch (error) {
+      return {
+        statusCode: 400,
+        status: false,
+        message: error.message,
+        data: {},
+      };
+    }
+}
+
+
 module.exports = {
   createstaff,
   updatestaff,
@@ -192,5 +223,6 @@ module.exports = {
   loginstaff,
   verifystaffToken,
   mailsend,
-  updatePaidFees
+  updatePaidFees,
+  cryptoModule
 };

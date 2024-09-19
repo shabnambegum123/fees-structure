@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
-const studentProfile = require("../Database/modal/studentprofile");
+const studentProfile = require("../Database/modal/studentProfile");
 const joi = require("joi");
 const staffprofile = require("../Database/modal/staffprofile");
 

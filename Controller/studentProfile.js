@@ -12,7 +12,8 @@ const {
   changePasswordService,
   bulkCreateService,
   PDFformatService,
-  getUsingJoinService
+  getUsingJoinService,
+ 
 } = require("../service/studentProfileservice");
 
 const createUser = async (req, res) => {
@@ -37,22 +38,24 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   let params = req.body;
   params.profileId = req.user.profileId;
-  params.ID = req.query.ID
+  params.ID = req.query.ID;
+  params.token = req.headers.authorization;
   const result = await updatestudent(params);
+  console.log("asdvqdwv", result);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
-      data: result.data,
+      data: result.data.data,
     });
   } else {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
-      data: result.data,
-    })
+      data: {},
+    });
   }
-}
+};
 
 const listUser = async (req, res) => {
   console.log("hello")
@@ -264,6 +267,7 @@ const bulkCreate = async (req,res) =>{
 
 const PDFformat = async (req,res) =>{
   try {
+    console.log("adsvqadw")
   let params = req.user
     let result = await PDFformatService(params);
 
@@ -285,7 +289,7 @@ const PDFformat = async (req,res) =>{
       statusCode: 400,
       status: false,
       message: error.message,
-      data: {},
+      data: error,
     };
   }
 }
@@ -333,5 +337,6 @@ module.exports = {
   changePassword,
   bulkCreate,
   PDFformat,
-  getUsingJoin
+  getUsingJoin,
+ 
 };

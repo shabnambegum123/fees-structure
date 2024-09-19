@@ -1,10 +1,11 @@
 const { date } = require("joi");
 const feestructure = require("../Database/modal/feestructure");
-const studentProfile = require("../Database/modal/studentprofile");
+const studentProfile = require("../Database/modal/studentProfile");
 
 const { axiosFunction } = require("../helpers/axios");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { pagaMetaService } = require("../helpers/pagination");
+
 const XLSX = require("xlsx");
 // create fee structure
 
@@ -206,37 +207,25 @@ const deletefeestructureService = async (params) => {
   }
 };
 // mangement should recieve the student details which where created on that day
-const sendMailManagement = async (params) => {
+const sendMailManagement = async (params,token) => {
   try {
-    let fromDate = params.fromDate;
-    let toDate = params.toDate;
+    // let fromDate = params.fromDate;
+    // let toDate = params.toDate;
+
+
     var find = await studentProfile.findAll({
       where: {
         createdAt: {
-          [Op.gt]: new Date(fromDate), //"2024-08-18"
-          [Op.lt]: new Date(toDate), //"2024-08-19"
+          [Op.gt]: new Date("2024-08-18"), //"2024-08-18"
+          [Op.lt]: new Date("2024-08-19"), //"2024-08-19"
         },
       },
       raw: true,
     });
-  
 
-    if (find) {
-      for (let i = 0;i<find.length;i++) {
-      
-        let url = process.env.managementUrl;
-       
-        let EmailId = "kishore.t@doodleblue.in";
-     
-        const axios = await axiosFunction(find, url, EmailId);
-      }
-    // } else {
-    //   return {
-    //     status: 400,
-    //     message: "error",
-    //     data: {},
-    //   };
-     }
+   
+   const send = await axiosFunction(find,token)
+    
   } catch (error) {
     console.log("error", error);
     return {
@@ -249,90 +238,111 @@ const sendMailManagement = async (params) => {
 };
 
 const downloadSheetService = async (req, res) => {
+  try {
+    const getDeptDetails = await studentProfile.findAll({
+      where: { Designation: "BSC" },
+      raw: true,
+    });
 
-    try {
-      
-      const getDeptDetails = await studentProfile.findAll({
-        where: { Designation: "BSC" },
-        raw: true,
-      });
-  
-     
-      const heading = [
-        [
-          "profileId",
-          "Name",
-          "EmailId",
-          "password",
-          "Role",
-          "is_FirstGraduate",
-          "category",
-          "currentYear",
-          "feestructureId",
-          "studentFeestrutureId",
-        ],
-      ];
-  
-      const data = getDeptDetails.map((item) => [
-        item.profileId,
-        item.Name,
-        item.EmailId,
-        item.password,
-        item.Role,
-        item.is_FirstGraduate,
-        item.category,
-        item.currentYear,
-        item.feestructureId,
-        item.studentFeestrutureId,
-      ]);
-  
-      
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.aoa_to_sheet([...heading, ...data]);
-      worksheet['!cols'] = [
-        { wpx: 100 }, 
-        { wpx: 150 }, 
-        { wpx: 200 }, 
-        { wpx: 500 }, 
-        { wpx: 100 }, 
-        { wpx: 150 }, 
-        { wpx: 120 }, 
-        { wpx: 100 }, 
-        { wpx: 150 }, 
-        { wpx: 180 } , 
-        { wpx: 180 }
-      ];
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-  
-     
-      const fileBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "buffer",
-      });
-  
+    const heading = [
+      [
+        "profileId",
+        "Name",
+        "EmailId",
+        "password",
+        "Role",
+        "is_FirstGraduate",
+        "category",
+        "currentYear",
+        "feestructureId",
+        "studentFeestrutureId",
+      ],
+    ];
+
+    const data = getDeptDetails.map((item) => [
+      item.profileId,
+      item.Name,
+      item.EmailId,
+      item.password,
+      item.Role,
+      item.is_FirstGraduate,
+      item.category,
+      item.currentYear,
+      item.feestructureId,
+      item.studentFeestrutureId,
+    ]);
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet([...heading, ...data]);
+    worksheet["!cols"] = [
+      { wpx: 100 },
+      { wpx: 150 },
+      { wpx: 200 },
+      { wpx: 500 },
+      { wpx: 100 },
+      { wpx: 150 },
+      { wpx: 120 },
+      { wpx: 100 },
+      { wpx: 150 },
+      { wpx: 180 },
+      { wpx: 180 },
+    ];
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    const fileBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "buffer",
+    });
+
+    return {
+      statusCode: 200,
+      status: true,
+      message: "File generated successfully",
+      data: fileBuffer,
+    };
+  } catch (error) {
+    console.error("Error generating file:", error.message);
+    return {
+      statusCode: 500,
+      status: false,
+      message: error.message,
+      data: {},
+    };
+  }
+};
+
+const axiosUrlService = async (params) => {
+  try {
+    let profileId = params.profileId;
+
+    let result = await studentProfile.findOne({
+      where: { profileId: profileId, is_deleted: false, is_suspended: false },
+    });
+
+    if (result) {
       return {
-        statusCode: 200, 
+        statusCode: 200,
         status: true,
-        message: "File generated successfully",
-        data: fileBuffer,
+        message: "sended",
+        data: result,
       };
-    } catch (error) {
-      console.error("Error generating file:", error.message);
+    } else {
       return {
-        statusCode: 500, 
+        statusCode: 400,
         status: false,
-        message: error.message,
+        message: "error",
         data: {},
       };
     }
-  };
-  
-  
-  
-  
-
-  
-
+  } catch (error) {
+    return {
+      statusCode: 400,
+      status: false,
+      message: error.message,
+      data: {},
+    };
+  }
+};
 
 module.exports = {
   createfeestructureService,
@@ -342,6 +352,7 @@ module.exports = {
   deletefeestructureService,
   sendMailManagement,
   downloadSheetService,
+  axiosUrlService,
 };
 // let Designation = params.Designation;
 // let getDeptDetails = await studentProfile.findAll({

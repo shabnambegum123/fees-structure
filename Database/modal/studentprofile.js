@@ -71,6 +71,6 @@ const studentProfile = sequelize.define(
   }
 )
 
-//studentProfile.belongsTo(studentFeestruture,{foreignKey:"studentFeestrutureId",as:"studentFeeDetails"})
+// 
 
 module.exports = studentProfile

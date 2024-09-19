@@ -76,8 +76,11 @@ const updatestudentFeeStructure = async (params) => {
 };
 // get by Id
 const getByIdstudentFeeStructure = async (params) => {
+ 
   try {
-    let studentFeestrutureId = params.studentFeestrutureId;
+    
+    let studentFeestrutureId = Number(params);
+       console.log( studentFeestrutureId,90)
     let result = await studentFeestruture.findOne({
       attributes: [
         "studentFeestrutureId",

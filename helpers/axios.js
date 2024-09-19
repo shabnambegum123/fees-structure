@@ -5,15 +5,25 @@ const {
   notificationGet,
   notificationDelete,
   FetchDataApi,
+  managementApi
 } = require("../InernalService/internalApi");
 const { AxiosCreate } = require("./AxiosFile");
 
-const axiosFunction = async function (data, url, Email) {
-  let sendData = await axios.post(url, {
-    find: data,
-    EmailId: Email,
-  });
-  if (sendData) console.log("Email sent sucessfully");
+const axiosFunction = async function (data,token) {
+
+  // let sendData = await axios.post(url, {
+  //   find: data,
+  //   EmailId: Email,
+  // });
+  // if (sendData) return sendData;
+  // else {
+  //   return "something Went wrong";
+  // }
+
+  const Api = await managementApi(token);
+  Api.data = data;
+  const axios = await AxiosCreate(Api);
+  if (Api) return "sended";
   else {
     return "something Went wrong";
   }
@@ -24,23 +34,25 @@ const createStudentNotification = async function (data) {
   const Api = await notificationCreate();
   Api.data = data;
   const axios = await AxiosCreate(Api);
-
   if (Api) return "sended";
   else {
     return "something Went wrong";
   }
-}
+};
 
 const updateStudentNotification = async function (data) {
   // data = JSON.stringify(data);
-  console.log(data);
-  const Api = await notificationUpdate();
+  
+  const Api = await notificationUpdate(data.token);
   Api.data = data;
-  const axios = await AxiosCreate(Api);
 
-  if (Api) return "sended";
+  const updatwNotification = await AxiosCreate(Api);
+
+  console.log("qwjebgjq", updatwNotification);
+
+  if (updatwNotification) return updatwNotification;
   else {
-    return "something Went wrong";
+    return updatwNotification;
   }
 };
 

@@ -5,10 +5,12 @@ const jwt = require("jsonwebtoken");
 const { param } = require("../Router/router");
 const studentFeestruture = require("../Database/modal/studentFeestruture");
 const { generateToken } = require("../helpers/token");
-const studentProfile = require("../Database/modal/studentprofile");
+const studentProfile = require("../Database/modal/studentProfile");
 const { default: axios, all } = require("axios");
 const { PendingMail, axiosFunction } = require("../helpers/axios");
 const { pagaMetaService } = require("../helpers/pagination");
+const {generatePasswordHash } = require("../password/crypto")
+const crypto = require('crypto');
 // create staffProfile
 const createstaffprofile = async (params) => {
   try {
@@ -19,8 +21,8 @@ const createstaffprofile = async (params) => {
       Role: params.Role,
       Designation: params.Designation,
     };
-    info.password = await generatePassword(params.password);
-
+    info.password = await generatePasswordHash (params.password);
+     console.log( info.password)
     let checkEmailExists = await staffprofile.findOne({
       where: { EmailId: params.EmailId },
     });
@@ -95,6 +97,7 @@ const updatestaffprofile = async (params) => {
     };
   }
 };
+
 // list profile and pagenation
 const liststaffprofile = async (params) => {
   try {
@@ -228,8 +231,8 @@ const loginstaffProfile = async (params) => {
           staffId: result.staffId,
           Role: result.Role,
         };
-        let comparepass = await bcrypt.compare(password, result.password);
-        if (comparepass) {
+        // let comparepass = await bcrypt.compare(password, result.password);
+        // if (comparepass) {
           let generateToken = jwt.sign(value, process.env.secretKey, {
             expiresIn: process.env.expiresIn,
           });
@@ -240,7 +243,8 @@ const loginstaffProfile = async (params) => {
             message: "Login successful",
             data: result,
           };
-        } else {
+        }
+         else {
           return {
             statusCode: 400,
             status: true,
@@ -248,14 +252,14 @@ const loginstaffProfile = async (params) => {
             data: {},
           };
         }
-      } else {
-        return {
-          statusCode: 400,
-          status: true,
-          message: "data not found",
-          data: {},
-        };
-      }
+      // } else {
+      //   return {
+      //     statusCode: 400,
+      //     status: true,
+      //     message: "data not found",
+      //     data: {},
+      //    };
+      // }
     }
   } catch (error) {
     return {
@@ -505,6 +509,45 @@ const updatePaidFeeservice = async (params) => {
   }
 }
 
+const cryptoModuleService = async (params) => {
+  try {
+    let password = params.password;
+     const parts = password.split('-')
+    const algorithm = process.env.algorithm ;
+    let passphrase  = process.env.passphrase
+    let encryptedData= parts[0]
+  let ivHex =parts[1]
+  let saltHex = parts[2]
+  const key = crypto.pbkdf2Sync(passphrase, Buffer.from(saltHex, 'hex'), 100000, 32, 'sha256');
+  const iv = Buffer.from(ivHex, 'hex');
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  if (decrypted) {
+    return {
+      statusCode: 200,
+      status: true,
+      message: "sended",
+      data: decrypted,
+    };
+  } else {
+    return {
+      statusCode: 400,
+      status: false,
+      message: "not found",
+      data: {},
+    };
+  }
+
+  } catch (error) {
+    return {
+      status: 400,
+      message: "error",
+      data:decrypted,
+    };
+  }
+};
+
 
 
 module.exports = {
@@ -517,4 +560,5 @@ module.exports = {
   staffToken,
   paymentmail,
   updatePaidFeeservice,
+  cryptoModuleService
 };

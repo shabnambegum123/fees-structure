@@ -1,5 +1,5 @@
 const { where, DatabaseError, STRING } = require("sequelize");
-const studentProfile = require("../Database/modal/studentprofile");
+const studentProfile = require("../Database/modal/studentProfile");
 const { generatePassword } = require("../password/bcrypt");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -10,7 +10,13 @@ const { default: axios, all } = require("axios");
 const path = require("path");
 const { generateToken } = require("../helpers/token");
 const { raw } = require("body-parser");
-const { axiosFunction,updateStudentNotification, createStudentNotification, getStudentNotification,DeleteStudentNotification } = require("../helpers/axios");
+const {
+  axiosFunction,
+  updateStudentNotification,
+  createStudentNotification,
+  getStudentNotification,
+  DeleteStudentNotification,
+} = require("../helpers/axios");
 const { pagaMetaService } = require("../helpers/pagination");
 const { string } = require("joi");
 const { param } = require("../Router/router");
@@ -216,8 +222,8 @@ const createstudent = async (params) => {
                 createstudentfeestructure.studentFeestrutureId,
             },
             { where: { profileId: result.profileId } }
-          )
-       console.log(result,"897087kjghj")
+          );
+          console.log(result, "897087kjghj");
           let passData = {
             Name: result.Name,
             EmailId: result.EmailId,
@@ -225,15 +231,16 @@ const createstudent = async (params) => {
             mobileNumber: result.mobileNumber,
             Role: result.Role,
             Designation: result.Designation,
-            is_FirstGraduate:result. is_FirstGraduate ,
+            is_FirstGraduate: result.is_FirstGraduate,
             category: result.category,
             currentYear: result.currentYear,
             feestructureId: result.feestructureId,
             profileId: result.profileId,
             is_deleted: result.is_deleted,
             is_suspended: result.is_suspended,
-          }
-          const axios = await createStudentNotification( passData);
+          };
+
+          const axios = await createStudentNotification(passData);
 
           // if (axios) {
           //   return {
@@ -300,40 +307,39 @@ const updatestudent = async (params) => {
     var result = await studentProfile.update(params, {
       where: { profileId: params.profileId },
       returning: true,
-    })
+    });
     
-   let passData ={
-   ID : params.ID,
-    Name : "hii"
-   }
-    const axios = await updateStudentNotification( passData);
 
-    if (result) {
+    const updataData = await updateStudentNotification(params, params.token);
+  
+    if (updataData) {
       return {
         statusCode: 200,
         status: true,
         message: "updated",
-        data: {},
+        data: updataData,
       };
     } else {
       return {
-        status: 400,
-        message: " not updated",
+        statusCode: 400,
+        status: false,
+        message: "not updated",
         data: {},
       };
     }
-  } catch (error) {
+  } 
+  catch (error) {
     return {
-      status: 400,
+      statusCode: 500,
+      status: false,
       message: "error",
-      data: {},
+      data:{},
     };
   }
 };
 
 // list student profile and pagenation
 const liststudent = async (params) => {
-  
   try {
     let whereQuery = {};
     if (params.is_deleted) {
@@ -393,7 +399,7 @@ const liststudent = async (params) => {
         statusCode: 200,
         status: true,
         message: "sended",
-        data: data
+        data: data,
       };
     } else {
       return {
@@ -403,7 +409,7 @@ const liststudent = async (params) => {
         data: {},
       };
     }
-    
+
     // console.log(params.Name);
     // let search = await studentProfile.findAll({
     //   where: whereQuery,
@@ -415,7 +421,6 @@ const liststudent = async (params) => {
     //   message: "sended",
     //   data: search,
     // }
-   
   } catch (error) {
     console.log("qewgqewf", error);
     return {
@@ -447,9 +452,9 @@ const getByIdstudent = async (params) => {
       where: {
         profileId: profileId,
       },
-    })
+    });
 
-   const axios = await  getStudentNotification (result)
+    const axios = await getStudentNotification(result);
 
     if (result) {
       return {
@@ -479,24 +484,23 @@ const getByIdstudent = async (params) => {
 
 const deletestudent = async (params) => {
   try {
-    
     var profileId = params.profileId;
     var result = await studentProfile.update(
       { is_deleted: "true" },
       {
         where: { profileId: profileId },
       }
-    )
+    );
     // let value ={
     //   profileId : params.profileId,
     //   is_deleted : true
     // }
 
     let value = {
-      ID : params.ID
-    }
+      ID: params.ID,
+    };
 
-    const axios = await  DeleteStudentNotification (value)
+    const axios = await DeleteStudentNotification(value);
     if (result) {
       return {
         statusCode: 200,
@@ -909,11 +913,11 @@ const bulkCreateService = async (params) => {
 
           let percentage =
             checkFeeStructure.TotalAmount - createStudentFeeData.TotalAmount;
-          createStudentFeeData.TotalAmount = percentage
+          createStudentFeeData.TotalAmount = percentage;
 
           let createstudentfeestructure = await studentFeestruture.create(
             createStudentFeeData
-          )
+          );
           let updatestudentprofile = await studentProfile.update(
             {
               studentFeestrutureId:
@@ -1023,11 +1027,11 @@ const PDFformatService = async (params) => {
       Name: params.Name,
       Designation: params.Designation,
       currentYear: params.currentYear,
-    }
-
+    };
+    console.log("wdvqwev")
     let url = process.env.PdfUrl;
     const axios = await axiosFunction(data, url, params.EmailId);
-
+    console.log("awwdvqwea", axios);
     if (axios) {
       return {
         statusCode: 200,
@@ -1056,7 +1060,6 @@ const PDFformatService = async (params) => {
 
 const getUsingJoinService = async (params) => {
   try {
-    
     // let result = await studentProfile.findOne({
     //   where:{profileId:params.profileId},
     //   include :[{
@@ -1065,20 +1068,22 @@ const getUsingJoinService = async (params) => {
     //   }]
     // })
 
-     let result = await studentFeestruture.findOne({
-      where:{studentId:params.studentId},
-      include :[{
-        model: studentProfile,
-        as : "studentDetails"
-      }]
-    })
+    let result = await studentFeestruture.findOne({
+      where: { studentId: params.studentId },
+      include: [
+        {
+          model: studentProfile,
+          as: "studentDetails",
+        },
+      ],
+    });
 
     if (result) {
       return {
         statusCode: 200,
         status: true,
         message: "sended",
-        data:result,
+        data: result,
       };
     } else {
       return {

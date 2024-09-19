@@ -7,10 +7,11 @@ const {
   deletefeestructureService,
   sendMailManagement,
   downloadSheetService,
+  axiosUrlService
 } = require("../service/feeStructureservice");
 
 const createFeestructure = async (req, res) => {
-  const datas = req.body;
+  const datas = req.body
   let result = await createfeestructureService(datas);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -29,22 +30,22 @@ const createFeestructure = async (req, res) => {
 
 const updateFeestructure = async (req, res) => {
   let params = req.body;
-
+   
   params.feestrutureId = req.query.feestrutureId;
   const result = await updatefeestructureService(params);
-  if (result.status) {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
-  } else {
-    res.status(result.statusCode).json({
-      status: result.statusCode,
-      message: result.message,
-      data: result.data,
-    });
-  }
+  // if (result.status) {
+  //   res.status(result.statusCode).json({
+  //     status: result.statusCode,
+  //     message: result.message,
+  //     data: result.data,
+  //   });
+  // } else {
+  //   res.status(result.statusCode).json({
+  //     status: result.statusCode,
+  //     message: result.message,
+  //     data: result.data,
+  //   });
+  // }
 };
 
 const listFeestructure = async (req, res) => {
@@ -87,6 +88,7 @@ const getByIdFeestructure = async (req, res) => {
 
 const deleteFeestructure = async (req, res) => {
   let data = req.query;
+ 
   const result = await deletefeestructureService(data);
   if (result.status) {
     res.status(result.statusCode).json({
@@ -105,14 +107,14 @@ const deleteFeestructure = async (req, res) => {
 
 const managementMail = async (req, res) => {
   const datas = req.body;
-
-  const result = await sendMailManagement(datas);
+    const token = req.headers.authorization
+  const result = await sendMailManagement(datas,token);
   if (result.status) {
     res.status(result.statusCode).json({
       status: result.statusCode,
       message: result.message,
       data: result.data,
-    });
+    })
   } else {
     res.status(result.statusCode).json({
       status: result.statusCode,
@@ -124,11 +126,10 @@ const managementMail = async (req, res) => {
 
 const downloadSheet = async (req, res) => {
   try {
-    const result = await downloadSheetService();
+    const result = await downloadSheetService()
 
     if (result.status) {
-     
-      res.setHeader("Content-Disposition", "attachment; filename=data.xlsx");
+     res.setHeader("Content-Disposition", "attachment; filename=data.xlsx");
       res.setHeader(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -148,6 +149,27 @@ const downloadSheet = async (req, res) => {
   }
 };
 
+const axiosUrl = async (req, res) => {
+  
+  let data = req.body.data.data
+  
+  const result = await axiosUrlService(data);
+  if (result.status) {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  } else {
+    res.status(result.statusCode).json({
+      status: result.statusCode,
+      message: result.message,
+      data: result.data,
+    });
+  }
+};
+
+
 module.exports = {
   createFeestructure,
   updateFeestructure,
@@ -156,4 +178,5 @@ module.exports = {
   listFeestructure,
   managementMail,
   downloadSheet,
+  axiosUrl
 };

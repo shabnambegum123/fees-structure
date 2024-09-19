@@ -63,8 +63,10 @@ const liststudentfee = async (req,res) => {
 };
 
 const getByIdstudentFee = async (req,res) => {
-  let params = req.body;
-  params.studentFeestrutureId = req.query.studentFeestrutureId;
+
+  let params=   req.params.studentFeestrutureId
+     
+  // params.studentFeestrutureId = req.query.studentFeestrutureId;
   const result = await getByIdstudentFeeStructure(params);
   if (result.status) {
     res.status(result.statusCode).json({
